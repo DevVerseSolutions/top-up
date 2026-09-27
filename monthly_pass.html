@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Membership - FF TopUp</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #28a745; --primary-color-rgb: 40, 167, 69;
+            --secondary-color: #218838; --background-color: #f8f9fa;
+            --card-bg-color: #ffffff; --text-color: #212529;
+            --subtle-text-color: #6c757d; --white-color: #ffffff;
+            --danger-color: #dc3545; --price-color: #dc3545;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popup-anim { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            background-color: var(--background-color); color: var(--text-color); 
+            padding-top: 75px; padding-bottom: 100px; 
+        }
+        
+        /* --- Consistent Template Styles --- */
+        .main-header, .bottom-nav, .modal-overlay, .app-footer, .help-button-wrapper {
+            /* All consistent styles from index.html are assumed here */
+        }
+        .main-header { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 420px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); z-index: 1000; padding: 8px 15px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .main-header .logo-container { display: flex; align-items: center; height: 44px; min-width: auto; justify-content: center; border-radius: 12px; background-color: #f0fdf0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); padding: 0 10px; }
+        .main-header .logo-text { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: var(--primary-color); white-space: nowrap; letter-spacing: 0.5px; text-shadow: 1px 1px 1px rgba(var(--primary-color-rgb), 0.1); }
+        .main-header .menu-icon { font-size: 22px; cursor: pointer; color: var(--primary-color); padding: 10px; height: 44px; width: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.3s ease, box-shadow 0.3s ease; background-color: #f0fdf0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+        .main-content { padding: 0 15px; padding-top: 25px; max-width: 420px; margin: 0 auto; }
+        .card { background: var(--card-bg-color); border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow); animation: fadeIn 0.5s ease-out forwards; }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: var(--text-color); text-align: center; }
+
+        /* --- Package Grid Styles (from previous version) --- */
+        .package-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .package-item { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px 10px; min-height: 80px; position: relative; border: 1px solid #e0e0e0; border-radius: 12px; background-color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; text-align: center; }
+        .package-item:hover, .package-item.selected { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,0.1); border-color: var(--primary-color); }
+        .package-item.selected { background-color: var(--primary-color); color: var(--white-color); }
+        .package-name { font-size: 15px; font-weight: 700; color: var(--text-color); margin-bottom: 8px; line-height: 1.3; }
+        .package-item.selected .package-name { color: var(--white-color); }
+        .package-price { font-size: 14px; font-weight: 700; color: var(--price-color); }
+        .package-item.selected .package-price { color: var(--white-color); }
+        .bonus-badge { position: absolute; top: -1px; right: -1px; background-color: var(--danger-color); color: var(--white-color); padding: 3px 8px; font-size: 11px; font-weight: 700; border-radius: 0 12px 0 8px; box-shadow: -1px 1px 3px rgba(0,0,0,0.2); }
+        .package-item.selected .bonus-badge { background-color: var(--white-color); color: var(--danger-color); }
+        
+        /* --- NEW: Internet Connection Status Alert Styles --- */
+        .offline-alert-overlay {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left = 0 */
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .offline-alert-box {
+            background-color: var(--card-bg-color);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: popup-anim 0.3s ease;
+        }
+        .offline-alert-box i {
+            font-size: 48px;
+            color: var(--danger-color);
+            margin-bottom: 20px;
+        }
+        .offline-alert-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        .offline-alert-box p {
+            color: var(--subtle-text-color);
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+        .retry-btn {
+            padding: 12px 25px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            transition: background-color 0.2s;
+        }
+        .retry-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* --- Reused Modal & Navigation Styles --- */
+        /* ... All other consistent styles from the previous file ... */
+        .help-button-wrapper, .bottom-nav, .modal-overlay, .modal-content, .modal-btn, .payment-method-buttons, .login-prompt-modal-content {
+            /* Styles for these elements are assumed to be here, copied from previous file */
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Fixed Header -->
+    <header class="main-header">
+        <div class="logo-container"><span class="logo-text">FF TopUp</span></div>
+        <div class="auth-area" id="headerAuthArea"></div>
+    </header>
+
+    <main class="main-content">
+        <h2 class="section-title">Monthly Membership অফার</h2>
+        <div class="card">
+            <div class="package-grid" id="specialPackagesGrid">
+                <p style="text-align: center; color: var(--subtle-text-color);">অফার লোড হচ্ছে...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ... Other Modals, Nav, Footer, etc. from previous file ... -->
+    
+    <!-- NEW: Internet Connection Status Alert HTML -->
+    <div id="offline-alert" class="offline-alert-overlay">
+        <div class="offline-alert-box">
+            <i class="fas fa-wifi"></i>
+            <h3>ইন্টারনেট সংযোগ নেই</h3>
+            <p>আপনার ডিভাইসটি ইন্টারনেটের সাথে সংযুক্ত নয়। সংযোগ পরীক্ষা করে পৃষ্ঠাটি পুনরায় লোড করুন।</p>
+            <button id="retry-connection-btn" class="retry-btn">পুনরায় চেষ্টা করুন</button>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <script type="module">
+        const firebaseConfig = {
+  apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
+  authDomain: "ff-topup-1c7b4.firebaseapp.com",
+  databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ff-topup-1c7b4",
+  storageBucket: "ff-topup-1c7b4.firebasestorage.app",
+  messagingSenderId: "319376678545",
+  appId: "1:319376678545:web:18b4e552f0eaf73970e930",
+  measurementId: "G-TEJL6H10X4"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // --- All previous UI Elements and Logic ---
+        const specialPackagesContainer = document.getElementById('specialPackagesGrid');
+        // ... (other element variables)
+
+        // --- NEW: Offline Detection Logic ---
+        const mainContent = document.querySelector('.main-content');
+        const offlineAlert = document.getElementById('offline-alert');
+        const retryBtn = document.getElementById('retry-connection-btn');
+
+        function handleConnectionChange() {
+            if (navigator.onLine) {
+                // Internet is connected
+                mainContent.style.display = 'block';
+                offlineAlert.style.display = 'none';
+            } else {
+                // Internet is disconnected
+                mainContent.style.display = 'none';
+                offlineAlert.style.display = 'flex'; // Use flex to center the box
+            }
+        }
+
+        // Add event listeners for connection status
+        window.addEventListener('online', handleConnectionChange);
+        window.addEventListener('offline', handleConnectionChange);
+        
+        // Add event listener for the retry button
+        retryBtn.addEventListener('click', () => {
+            window.location.reload();
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial check when the page loads
+            handleConnectionChange();
+
+            // --- All previous logic for loading packages, purchase flow, etc. ---
+            const packagesRef = database.ref('special_packages/monthly').orderByChild('order');
+            packagesRef.on('value', (snapshot) => {
+                // ... (the rest of your package loading logic)
+            });
+            // ... (the rest of your event listeners for modals, nav, etc.)
+        });
+
+    </script>
+</body>
+</html>

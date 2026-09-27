@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লেভেল আপ পাস - FF TopUp</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #28a745; 
+            --primary-color-rgb: 40, 167, 69;
+            --secondary-color: #218838; 
+            --background-color: #f8f9fa; 
+            --card-bg-color: #ffffff; 
+            --text-color: #212529; 
+            --subtle-text-color: #6c757d; 
+            --white-color: #ffffff;
+            --danger-color: #dc3545; 
+            --price-color: #dc3545;
+            --levelup-accent-color: #d97706; /* গোল্ডেন/অ্যাম্বার গেম পাস থিম */
+            --levelup-accent-rgb: 217, 119, 6;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08); 
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-selected {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--levelup-accent-rgb), 0.5); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(var(--levelup-accent-rgb), 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--levelup-accent-rgb), 0); }
+        }
+        @keyframes pulse-help {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(var(--primary-color-rgb), 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0); }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            background-color: var(--background-color); 
+            color: var(--text-color); 
+            padding-top: 65px; 
+            padding-bottom: 95px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Fixed Header with Back Button */
+        .main-header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: linear-gradient(135deg, var(--levelup-accent-color), #f59e0b);
+            color: var(--white-color);
+            padding: 12px 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .main-header .back-btn {
+            background: none; border: none; color: var(--white-color);
+            font-size: 19px; cursor: pointer; padding: 5px 8px;
+            transition: transform 0.2s;
+        }
+        .main-header .back-btn:hover { transform: translateX(-4px); }
+        .main-header .page-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 19px; font-weight: 700;
+            color: var(--white-color);
+            margin: 0; flex-grow: 1; text-align: center;
+            transform: translateX(-15px);
+            letter-spacing: 0.5px;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 15px 12px;
+            max-width: 420px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card { 
+            background: var(--card-bg-color); border-radius: 20px; 
+            padding: 22px; margin-bottom: 20px; 
+            box-shadow: var(--shadow); animation: fadeIn 0.4s ease-out forwards; 
+        }
+
+        /* Hero Banner */
+        .levelup-hero-banner {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #fde68a;
+            border-radius: 20px;
+            padding: 20px 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .levelup-hero-banner .hero-badge {
+            font-size: 40px;
+            color: var(--levelup-accent-color);
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .levelup-hero-banner h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 5px;
+        }
+        .levelup-hero-banner p {
+            font-size: 13px;
+            color: #78350f;
+            line-height: 1.4;
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px; font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Package Grid Items */
+        .levelup-grid { 
+            display: grid; 
+            grid-template-columns: repeat(1, 1fr); 
+            gap: 14px;
+        } 
+        .levelup-item { 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .levelup-item:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 5px 14px rgba(0,0,0,0.1); 
+            border-color: var(--levelup-accent-color); 
+        }
+        .levelup-item.selected { 
+            background-color: #fffdf5;
+            border-color: var(--levelup-accent-color);
+            box-shadow: 0 0 0 3px rgba(var(--levelup-accent-rgb), 0.4);
+            animation: pulse-selected 2s infinite;
+        }
+
+        .levelup-item .item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .levelup-item .item-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .levelup-item .item-title i {
+            font-size: 22px;
+            color: var(--levelup-accent-color);
+        }
+        .levelup-item .item-title h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+        }
+        .levelup-item .price {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--price-color);
+        }
+
+        .levelup-item .diamonds-info {
+            font-size: 13px;
+            color: var(--subtle-text-color);
+            margin-bottom: 8px;
+        }
+        .levelup-item .diamonds-info strong {
+            color: var(--primary-color);
+        }
+
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+            font-size: 12px;
+            color: var(--subtle-text-color);
+        }
+        .features-list li {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .features-list li i {
+            color: var(--primary-color);
+            font-size: 12px;
+        }
+
+        /* Reward Breakdown Table */
+        .rewards-summary {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .rewards-summary table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        .rewards-summary th, .rewards-summary td {
+            padding: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .rewards-summary th {
+            color: var(--subtle-text-color);
+            font-weight: 600;
+        }
+        .rewards-summary td {
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .rewards-summary td:last-child {
+            color: var(--primary-color);
+        }
+
+        /* Disclaimer Card */
+        .disclaimer-card {
+            background-color: #fff9db;
+            border: 1px solid #ffe066;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #856404;
+        }
+        .disclaimer-card h4 {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 14px; margin-bottom: 8px; color: #856404;
+        }
+        .disclaimer-card ul {
+            padding-left: 18px; margin: 0; line-height: 1.5;
+        }
+
+        /* Player ID Modal (Exact Screenshot Style) */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); 
+            z-index: 2000; display: none; align-items: center; justify-content: center; 
+            opacity: 0; transition: opacity 0.3s ease; 
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { 
+            background: var(--card-bg-color); border-radius: 24px; 
+            width: 90%; max-width: 330px; padding: 25px 20px; 
+            position: relative; animation: fadeIn 0.3s ease; 
+        }
+        .close-modal { 
+            position: absolute; top: 14px; right: 14px; 
+            background: #f1f5f9; border: none; 
+            width: 32px; height: 32px; border-radius: 50%; 
+            font-size: 14px; color: var(--subtle-text-color); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            transition: transform 0.2s; 
+        }
+        .close-modal:hover { transform: scale(1.1); }
+        .modal-form-group { margin-bottom: 16px; }
+        .modal-form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-color); font-size: 14px; }
+        .modal-form-group input[type="text"] {
+            width: 100%; padding: 13px 15px; border: 1px solid #dce2e6;
+            border-radius: 12px; font-size: 15px; font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: #ffffff; outline: none; transition: border-color 0.2s;
+        }
+        .modal-form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+        }
+        .modal-form-group input.auto-amount {
+            background-color: #f8faff;
+            font-weight: 700;
+            color: var(--price-color);
+            font-size: 16px;
+        }
+        .modal-btn {
+            width: 100%; padding: 13px; border-radius: 14px; border: none;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s; margin-top: 10px;
+        }
+        .modal-btn.primary { background-color: var(--primary-color); color: var(--white-color); }
+        .modal-btn.secondary { background-color: #f1f5f9; color: var(--text-color); border: 1px solid #e2e8f0; }
+        .modal-btn:hover { transform: translateY(-2px); }
+        .modal-btn.primary:hover { background-color: var(--secondary-color); }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--background-color);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 3000; transition: opacity 0.3s ease;
+        }
+        .loading-screen.hidden { opacity: 0; pointer-events: none; }
+        .loading-spinner-large {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--levelup-accent-color);
+            border-radius: 50%; width: 42px; height: 42px;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Floating Help Button */
+        .help-button-wrapper {
+            position: fixed; right: 20px; bottom: 85px; z-index: 999;
+        }
+        .help-button {
+            background: var(--primary-color); color: var(--white-color);
+            width: 52px; height: 52px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse-help 2s infinite; 
+        }
+
+        /* Bottom Nav */
+        .bottom-nav { 
+            position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); 
+            width: 95%; max-width: 420px; 
+            background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); 
+            display: flex; justify-content: space-around; align-items: center; 
+            height: 58px; border-radius: 30px; padding: 0 10px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 1000; 
+        }
+        .nav-item-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            text-decoration: none; color: #aaa; transition: color 0.3s; padding: 4px 0; 
+        }
+        .nav-item i { font-size: 19px; }
+        .nav-item span { font-size: 11px; margin-top: 3px; } 
+        .nav-item:hover { color: var(--primary-color); }
+
+        /* Footer */
+        .app-footer {
+            text-align: center; padding: 20px 10px; margin-top: auto;
+            background-color: var(--card-bg-color); border-radius: 15px;
+            box-shadow: var(--shadow); color: var(--subtle-text-color); font-size: 13px;
+        }
+        .app-footer h4 { font-size: 15px; color: var(--text-color); margin-bottom: 10px; }
+        .app-footer .footer-links a { color: var(--primary-color); text-decoration: none; margin: 0 6px; font-weight: 500; }
+        .app-footer p { margin-top: 10px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+    <!-- Initial Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner-large"></div>
+        <p style="font-size: 15px; color: var(--text-color);">লেভেল আপ পাস লোড হচ্ছে...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+        <h1 class="page-title">লেভেল আপ পাস</h1>
+    </header>
+
+    <main id="levelUpMainContent" style="display: none;">
+        <!-- Hero Banner -->
+        <div class="levelup-hero-banner">
+            <i class="fas fa-medal hero-badge"></i>
+            <h2>Free Fire Level Up Pass</h2>
+            <p>আপনার গেমিং লেভেল অনুযায়ী মোট ৮০২+ ডায়মন্ড ক্লেইম করুন সবচেয়ে কম খরচে!</p>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">প্যাকেজ নির্বাচন করুন</h2>
+            <div class="levelup-grid" id="levelUpPackagesContainer">
+                <!-- Dynamically loaded from Firebase or Fallback -->
+            </div>
+        </div>
+
+        <!-- Reward Breakdown Info Card -->
+        <div class="card">
+            <h3 class="section-title"><i class="fas fa-gift" style="color: var(--levelup-accent-color);"></i> লেভেল অনুযায়ী ডায়মন্ড রিওয়ার্ড</h3>
+            <div class="rewards-summary">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>লেভেল (Level)</th>
+                            <th>ডায়মন্ড রিওয়ার্ড</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Level 2</td><td>+50 Diamonds</td></tr>
+                        <tr><td>Level 4</td><td>+50 Diamonds</td></tr>
+                        <tr><td>Level 6</td><td>+50 Diamonds</td></tr>
+                        <tr><td>Level 8</td><td>+50 Diamonds</td></tr>
+                        <tr><td>Level 10</td><td>+100 Diamonds</td></tr>
+                        <tr><td>Level 13 - 16</td><td>+100 Diamonds</td></tr>
+                        <tr><td>Level 20</td><td>+100 Diamonds</td></tr>
+                        <tr><td>Level 25</td><td>+100 Diamonds</td></tr>
+                        <tr><td>Level 30</td><td>+202 Diamonds</td></tr>
+                        <tr style="background: #eef2ff;"><td><strong>সর্বমোট (Total)</strong></td><td><strong>৮০২ ডায়মন্ড</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Instructions / Warning -->
+        <div class="disclaimer-card">
+            <h4><i class="fas fa-exclamation-triangle"></i> জরুরি নিয়মাবলী:</h4>
+            <ul>
+                <li>একটি Free Fire অ্যাকাউন্টে লেভেল আপ পাস <strong>শুধুমাত্র একবারই</strong> কেনা যায়।</li>
+                <li>আপনার আইডির লেভেল ইতোমধ্যে ৩০ হলে পেমেন্টের পর একসাথেই সব ডায়মন্ড ক্লেইম করতে পারবেন।</li>
+                <li>আপনার সঠিক Player ID (UID) প্রদান করুন। ভুল ইউআইডি দিলে কর্তৃপক্ষ দায়ী থাকবে না।</li>
+                <li>অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স থাকলে অটোমেটিক টাকা কেটে অর্ডার সম্পন্ন হবে।</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Floating Help Button -->
+    <div class="help-button-wrapper">
+        <button id="helpCenterBtn" class="help-button">
+            <i class="fas fa-headset"></i>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <div class="nav-item-wrapper"><a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>হোম</span></a></div>
+        <div class="nav-item-wrapper"><a href="offers.html" class="nav-item"><i class="fas fa-tags"></i><span>অফার</span></a></div>
+        <div class="nav-item-wrapper"><a href="tutorial.html" class="nav-item"><i class="fas fa-book"></i><span>টিউটোরিয়াল</span></a></div>
+        <div class="nav-item-wrapper"><a href="history.html" class="nav-item"><i class="fas fa-history"></i><span>অর্ডার</span></a></div>
+        <div class="nav-item-wrapper"><a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer" id="levelUpFooter" style="display: none;">
+        <h4>FF TopUp</h4>
+        <div class="footer-links">
+            <a href="#">নিয়মাবলী</a>
+            <a href="#">গোপনীয়তা নীতি</a>
+            <a href="#">Refund Policy</a>
+        </div>
+        <p>&copy; 2026 FF TopUp. সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <!-- Player ID Input Modal (Auto-amount & Direct Balance Deduction) -->
+    <div class="modal-overlay" id="idInputModal">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h3 class="section-title" style="text-align: center; margin-bottom: 20px;">Player ID দিন</h3>
+            <div class="modal-form-group">
+                <label for="modalPlayerIdInput">আপনার Free Fire Player ID (UID):</label>
+                <input type="text" id="modalPlayerIdInput" placeholder="এখানে UID দিন">
+            </div>
+            <div class="modal-form-group">
+                <label for="modalPriceInput">প্যাকেজের মূল্য (অটোমেটিক):</label>
+                <input type="text" id="modalPriceInput" class="auto-amount" readonly>
+            </div>
+            <button class="modal-btn primary" id="modalVerifyIdBtn">পেমেন্টে এগিয়ে যান</button>
+            <button class="modal-btn secondary" id="modalCancelIdInputBtn">বাতিল করুন</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <script type="module">
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
+            authDomain: "ff-topup-1c7b4.firebaseapp.com",
+            databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-topup-1c7b4",
+            storageBucket: "ff-topup-1c7b4.firebasestorage.app",
+            messagingSenderId: "319376678545",
+            appId: "1:319376678545:web:18b4e552f0eaf73970e930",
+            measurementId: "G-TEJL6H10X4"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(app);
+        const database = firebase.database(app);
+
+        // UI references
+        const loadingScreen = document.getElementById('loadingScreen');
+        const levelUpMainContent = document.getElementById('levelUpMainContent');
+        const levelUpFooter = document.getElementById('levelUpFooter');
+        const levelUpPackagesContainer = document.getElementById('levelUpPackagesContainer');
+
+        const idInputModal = document.getElementById('idInputModal');
+        const modalPlayerIdInput = document.getElementById('modalPlayerIdInput');
+        const modalPriceInput = document.getElementById('modalPriceInput');
+        const modalVerifyIdBtn = document.getElementById('modalVerifyIdBtn');
+        const modalCancelIdInputBtn = document.getElementById('modalCancelIdInputBtn');
+
+        let currentSelectedPackage = null;
+
+        // Default Level Up Pass package fallback
+        const defaultLevelUpOffers = [
+            {
+                id: 'levelup_standard',
+                name: 'লেভেল আপ পাস (802 Diamonds)',
+                diamonds: '৮০২ ডায়মন্ড',
+                price: 190,
+                features: [
+                    'লেভেল ২ থেকে ৩০ পর্যন্ত ডায়মন্ড রিওয়ার্ড',
+                    'সর্বমোট ৮০২ ডায়মন্ড সরাসরি গেম আইডিতে',
+                    'একটি আইডিতে একবারই নেওয়া যাবে',
+                    'তাত্ক্ষণিক ও নিরাপদ ডেলিভারি'
+                ]
+            }
+        ];
+
+        // Auth state checking
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            loadLevelUpPackages();
+        });
+
+        // Load packages from Firebase
+        async function loadLevelUpPackages() {
+            loadingScreen.classList.remove('hidden');
+
+            try {
+                const snapshot = await database.ref('levelUpPackages').orderByChild('order').once('value');
+                levelUpPackagesContainer.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    let hasActive = false;
+                    snapshot.forEach((child) => {
+                        const pack = child.val();
+                        if (pack.isActive !== false) {
+                            hasActive = true;
+                            renderLevelUpItem(child.key, pack);
+                        }
+                    });
+                    if (!hasActive) renderDefaultPackages();
+                } else {
+                    renderDefaultPackages();
+                }
+
+            } catch (err) {
+                console.warn("Firebase Level Up fetch failed, using fallback:", err);
+                renderDefaultPackages();
+            } finally {
+                loadingScreen.classList.add('hidden');
+                levelUpMainContent.style.display = 'block';
+                levelUpFooter.style.display = 'block';
+            }
+        }
+
+        function renderDefaultPackages() {
+            levelUpPackagesContainer.innerHTML = '';
+            defaultLevelUpOffers.forEach(pack => {
+                renderLevelUpItem(pack.id, pack);
+            });
+        }
+
+        function renderLevelUpItem(id, pack) {
+            const item = document.createElement('div');
+            item.className = 'levelup-item';
+            item.dataset.id = id;
+            item.dataset.name = pack.name;
+            item.dataset.diamonds = pack.diamonds || '৮০২ ডায়মন্ড';
+            item.dataset.price = pack.price;
+
+            const featuresHtml = (pack.features && Array.isArray(pack.features))
+                ? pack.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('')
+                : `<li><i class="fas fa-check-circle"></i> লেভেল অনুযায়ী ডায়মন্ড</li><li><i class="fas fa-check-circle"></i> সুপার ফাস্ট ডেলিভারি</li>`;
+
+            item.innerHTML = `
+                <div class="item-header">
+                    <div class="item-title">
+                        <i class="fas fa-crown"></i>
+                        <h3>${pack.name}</h3>
+                    </div>
+                    <span class="price">৳ ${parseFloat(pack.price).toFixed(2)}</span>
+                </div>
+                <div class="diamonds-info">মোট ডায়মন্ড: <strong>${pack.diamonds || '৮০২ ডায়মন্ড'}</strong></div>
+                <ul class="features-list">
+                    ${featuresHtml}
+                </ul>
+            `;
+            levelUpPackagesContainer.appendChild(item);
+        }
+
+        // 1. Package selection & Auto-amount placement
+        levelUpPackagesContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('.levelup-item');
+            if (target) {
+                document.querySelectorAll('.levelup-item').forEach(i => i.classList.remove('selected'));
+                target.classList.add('selected');
+
+                currentSelectedPackage = {
+                    id: target.dataset.id,
+                    name: target.dataset.name,
+                    diamonds: target.dataset.diamonds,
+                    price: parseFloat(target.dataset.price)
+                };
+
+                // Clear previous UID and auto-fill amount
+                modalPlayerIdInput.value = '';
+                modalPriceInput.value = `৳ ${currentSelectedPackage.price.toFixed(2)}`;
+                
+                // Show modal
+                idInputModal.classList.add('active');
+            }
+        });
+
+        // Modal close actions
+        idInputModal.querySelector('.close-modal').addEventListener('click', () => {
+            idInputModal.classList.remove('active');
+            deselectPackages();
+        });
+
+        modalCancelIdInputBtn.addEventListener('click', () => {
+            idInputModal.classList.remove('active');
+            deselectPackages();
+        });
+
+        function deselectPackages() {
+            document.querySelectorAll('.levelup-item').forEach(i => i.classList.remove('selected'));
+            currentSelectedPackage = null;
+        }
+
+        // 2. Direct Account Balance Deduction Payment
+        modalVerifyIdBtn.addEventListener('click', async () => {
+            const uid = modalPlayerIdInput.value.trim();
+
+            if (!uid) {
+                alert('অনুগ্রহ করে আপনার Free Fire Player ID (UID) প্রদান করুন।');
+                return;
+            }
+
+            if (!currentSelectedPackage) {
+                alert('প্যাকেজ নির্বাচন করা হয়নি।');
+                return;
+            }
+
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                alert('অনুগ্রহ করে প্রথমে লগইন করুন।');
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            // Disable button during processing
+            modalVerifyIdBtn.disabled = true;
+            modalVerifyIdBtn.innerText = 'পেমেন্ট প্রসেস হচ্ছে...';
+
+            const userRef = database.ref('users/' + currentUser.uid);
+
+            // Transaction: Securely deduct balance from user account
+            userRef.child('balance').transaction((currentBalance) => {
+                const numericBalance = typeof currentBalance === 'number' ? currentBalance : 0;
+                if (numericBalance >= currentSelectedPackage.price) {
+                    return numericBalance - currentSelectedPackage.price;
+                }
+                return undefined; // Abort if insufficient balance
+            }, async (error, committed, snapshot) => {
+                if (error) {
+                    console.error('Transaction failed:', error);
+                    alert('পেমেন্ট প্রক্রিয়া ব্যর্থ হয়েছে! আবার চেষ্টা করুন।');
+                    resetModalButton();
+                } else if (!committed) {
+                    alert('আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই! দয়া করে ওয়ালেটে টাকা জমা (ডিপোজিট) করুন।');
+                    resetModalButton();
+                } else {
+                    // Balance deducted successfully, create order
+                    try {
+                        const newOrderRef = database.ref('orders').push();
+                        await newOrderRef.set({
+                            uid: currentUser.uid,
+                            playerId: uid,
+                            playerName: currentUser.displayName || 'N/A',
+                            packageName: currentSelectedPackage.name,
+                            diamonds: currentSelectedPackage.diamonds,
+                            price: currentSelectedPackage.price,
+                            paymentMethod: 'main_balance',
+                            orderType: 'level_up_pass',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                            status: 'pending'
+                        });
+
+                        alert('সফলভাবে লেভেল আপ পাস অর্ডার সম্পন্ন হয়েছে! আপনার ব্যালেন্স থেকে টাকা কেটে নেওয়া হয়েছে।');
+                        idInputModal.classList.remove('active');
+                        window.location.href = 'history.html'; // Redirect to order history
+                    } catch (orderError) {
+                        console.error('Error saving order:', orderError);
+                        alert('অর্ডার সেভ করতে সমস্যা হয়েছে। সাপোর্টে যোগাযোগ করুন।');
+                        resetModalButton();
+                    }
+                }
+            });
+        });
+
+        function resetModalButton() {
+            modalVerifyIdBtn.disabled = false;
+            modalVerifyIdBtn.innerText = 'পেমেন্টে এগিয়ে যান';
+        }
+
+        // Floating Help Button
+        document.getElementById('helpCenterBtn').addEventListener('click', () => {
+            window.location.href = 'help_center.html';
+        });
+    </script>
+</body>
+</html>

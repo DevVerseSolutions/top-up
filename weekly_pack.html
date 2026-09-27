@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সাপ্তাহিক প্যাক - FF TopUp</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #28a745; /* সবুজ */
+            --primary-color-rgb: 40, 167, 69;
+            --secondary-color: #218838; /* গাঢ় সবুজ */
+            --background-color: #f8f9fa; /* হালকা ধূসর ব্যাকগ্রাউন্ড */
+            --card-bg-color: #ffffff; /* সাদা */
+            --text-color: #212529; /* গাঢ় ধূসর */
+            --subtle-text-color: #6c757d; /* ধূসর টেক্সট */
+            --white-color: #ffffff;
+            --danger-color: #dc3545; /* লাল */
+            --price-color: #dc3545;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* হালকা শ্যাডো */
+            --weekly-accent-color: #6f42c1; /* Purple accent for weekly pass */
+            --weekly-accent-color-rgb: 111, 66, 193; /* RGB for the purple accent */
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-selected {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--weekly-accent-color-rgb), 0.5); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(var(--weekly-accent-color-rgb), 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--weekly-accent-color-rgb), 0); }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            background-color: var(--background-color); 
+            color: var(--text-color); 
+            padding-top: 60px; /* Adjusted for fixed header */
+            padding-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Consistent Header Style */
+        .main-header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: var(--weekly-accent-color); /* Themed header */
+            color: var(--white-color);
+            padding: 10px 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .main-header .back-btn {
+            background: none; border: none; color: var(--white-color);
+            font-size: 18px; cursor: pointer; padding: 5px 10px;
+            transition: transform 0.2s;
+        }
+        .main-header .back-btn:hover { transform: translateX(-5px); }
+        .main-header .page-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px; font-weight: 700;
+            color: var(--white-color);
+            margin: 0;
+            flex-grow: 1;
+            text-align: center;
+            transform: translateX(-15px);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 15px 10px;
+            max-width: 420px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card { 
+            background: var(--card-bg-color); border-radius: 20px; 
+            padding: 25px; margin-bottom: 25px; 
+            box-shadow: var(--shadow); animation: fadeIn 0.5s ease-out forwards; 
+        }
+        .section-title {
+            font-family: 'Oswald', sans-serif; /* Consistent font with page title */
+            font-size: 20px; font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Weekly Pass Grid Styles (Similar to Monthly Pass) */
+        .weekly-grid { 
+            display: grid; 
+            grid-template-columns: repeat(1, 1fr); /* Single column for readability */
+            gap: 15px;
+            margin-top: 15px;
+        } 
+        .weekly-item { 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start; /* Align left */
+            padding: 15px;
+            min-height: 150px; 
+            position: relative;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .weekly-item:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 5px 12px rgba(0,0,0,0.1); 
+            border-color: var(--weekly-accent-color); 
+        }
+        .weekly-item.selected { 
+            background-color: var(--weekly-accent-color); 
+            color: var(--white-color); 
+            border-color: var(--weekly-accent-color);
+            box-shadow: 0 0 0 3px rgba(var(--weekly-accent-color-rgb), 0.7); /* Stronger border-shadow */
+            transform: translateY(-3px);
+            animation: pulse-selected 2s infinite;
+        }
+
+        .weekly-item .item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .weekly-item .item-header i {
+            font-size: 24px;
+            color: var(--weekly-accent-color);
+        }
+        .weekly-item.selected .item-header i {
+            color: var(--white-color);
+        }
+        .weekly-item .item-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+            flex-grow: 1;
+        }
+        .weekly-item.selected .item-header h3 {
+            color: var(--white-color);
+        }
+        .weekly-item .item-header .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--price-color);
+            white-space: nowrap;
+        }
+        .weekly-item.selected .item-header .price {
+            color: var(--white-color);
+        }
+
+        .weekly-item .diamonds-info {
+            font-size: 14px;
+            color: var(--subtle-text-color);
+            margin-bottom: 10px;
+        }
+        .weekly-item.selected .diamonds-info {
+            color: rgba(255,255,255,0.8);
+        }
+        .weekly-item .diamonds-info strong {
+            color: var(--text-color);
+        }
+        .weekly-item.selected .diamonds-info strong {
+            color: var(--white-color);
+        }
+
+        .weekly-item .features-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--subtle-text-color);
+            width: 100%;
+        }
+        .weekly-item.selected .features-list {
+            color: rgba(255,255,255,0.7);
+        }
+        .weekly-item .features-list li {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .weekly-item .features-list li i {
+            margin-right: 8px;
+            font-size: 12px;
+            color: var(--primary-color); /* Green checkmark */
+        }
+        .weekly-item.selected .features-list li i {
+            color: var(--white-color);
+        }
+
+        /* Player ID Input Modal (Consistent with home2upd.html) */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); 
+            z-index: 2000; display: none; align-items: center; justify-content: center; 
+            opacity: 0; transition: opacity 0.3s ease; 
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { 
+            background: var(--card-bg-color); border-radius: 20px; 
+            width: 90%; max-width: 320px; padding: 20px; 
+            position: relative; animation: fadeIn 0.3s ease; 
+        }
+        .close-modal { 
+            position: absolute; top: 10px; right: 10px; 
+            background: #f1f5f9; border: none; 
+            width: 30px; height: 30px; border-radius: 50%; 
+            font-size: 14px; color: var(--subtle-text-color); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            z-index: 10; transition: transform 0.2s; 
+        }
+        .close-modal:hover { transform: scale(1.1); }
+        .modal-content .section-title { font-size: 18px; margin-bottom: 20px; }
+        .modal-form-group { margin-bottom: 15px; }
+        .modal-form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-color); font-size: 14px; }
+        .modal-form-group input[type="text"] {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 10px; font-size: 16px; font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: #f8faff;
+        }
+        .modal-form-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25); }
+        .modal-btn {
+            width: 100%; padding: 12px; border-radius: 12px; border: none;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s; margin-top: 10px;
+        }
+        .modal-btn.primary { background-color: var(--primary-color); color: var(--white-color); }
+        .modal-btn.secondary { background-color: #e9ecef; color: var(--text-color); border: 1px solid #ced4da; }
+        .modal-btn:hover { transform: translateY(-2px); }
+        .modal-btn.primary:hover { background-color: var(--secondary-color); }
+
+
+        /* Loading Screen (Consistent with live_pyment.html) */
+        .loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000; /* Above all other content */
+            transition: opacity 0.3s ease;
+        }
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none; /* Make it unclickable */
+        }
+        .loading-spinner-large {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        /* Footer (Consistent) */
+        .app-footer {
+            text-align: center;
+            padding: 20px 10px;
+            margin-top: auto;
+            background-color: var(--card-bg-color);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            color: var(--subtle-text-color);
+            font-size: 13px;
+        }
+        .app-footer h4 {
+            font-size: 15px;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+        .app-footer .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 6px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .app-footer .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+        .app-footer p {
+            margin-top: 12px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Initial Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner-large"></div>
+        <p class="loading-text">প্যাক লোড হচ্ছে...</p>
+    </div>
+
+    <header class="main-header">
+        <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+        <h1 class="page-title">সাপ্তাহিক প্যাক</h1>
+    </header>
+
+    <main id="weeklyPackMainContent" style="display: none;">
+        <div class="card">
+            <h2 class="section-title">আপনার সাপ্তাহিক প্যাক নির্বাচন করুন</h2>
+            <div class="weekly-grid" id="weeklyPackages">
+                <p style="text-align: center; color: var(--subtle-text-color);">সাপ্তাহিক প্যাক লোড হচ্ছে...</p>
+                <!-- Weekly packages will be loaded here dynamically from Firebase -->
+            </div>
+            <p id="noWeeklyMessage" style="text-align: center; color: var(--subtle-text-color); display: none; margin-top: 20px;">
+                কোনো সক্রিয় সাপ্তাহিক প্যাক পাওয়া যায়নি।
+            </p>
+        </div>
+    </main>
+
+    <footer class="app-footer" id="weeklyPackFooter" style="display: none;">
+        <h4>FF TopUp</h4>
+        <div class="footer-links">
+            <a href="#">নিয়মাবলী</a>
+            <a href="#">গোপনীয়তা নীতি</a>
+            <a href="#">Refund Policy</a>
+        </div>
+        <p>&copy; 2026 FF TopUp. সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <!-- Player ID Input Modal (Consistent with home2upd.html) -->
+    <div class="modal-overlay" id="idInputModal">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h3 class="section-title" style="text-align: center;">Free Fire ID দিন</h3>
+            <div class="modal-form-group">
+                <label for="modalPlayerIdInput">আপনার Free Fire Player ID (UID) লিখুন:</label>
+                <input type="text" id="modalPlayerIdInput" placeholder="এখানে UID লিখুন" class="form-control">
+            </div>
+            <button class="modal-btn primary" id="modalVerifyIdBtn">ID যাচাই করুন</button>
+            <button class="modal-btn secondary" id="modalCancelIdInputBtn">বাতিল করুন</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> <!-- For Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script> <!-- For Realtime Database -->
+
+    <script type="module">
+        const firebaseConfig = {
+  apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
+  authDomain: "ff-topup-1c7b4.firebaseapp.com",
+  databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ff-topup-1c7b4",
+  storageBucket: "ff-topup-1c7b4.firebasestorage.app",
+  messagingSenderId: "319376678545",
+  appId: "1:319376678545:web:18b4e552f0eaf73970e930",
+  measurementId: "G-TEJL6H10X4"
+};
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(app);
+        const database = firebase.database(app);
+
+        // UI elements
+        const loadingScreen = document.getElementById('loadingScreen');
+        const weeklyPackMainContent = document.getElementById('weeklyPackMainContent');
+        const weeklyPackFooter = document.getElementById('weeklyPackFooter');
+        const weeklyPackagesContainer = document.getElementById('weeklyPackages');
+        const noWeeklyMessage = document.getElementById('noWeeklyMessage');
+
+        // Player ID Modal elements
+        const idInputModal = document.getElementById('idInputModal');
+        const modalPlayerIdInput = document.getElementById('modalPlayerIdInput');
+        const modalVerifyIdBtn = document.getElementById('modalVerifyIdBtn');
+        const modalCancelIdInputBtn = document.getElementById('modalCancelIdInputBtn');
+
+        let currentSelectedWeeklyPackage = null;
+        let currentEnteredPlayerId = null;
+
+        // --- Utility Functions ---
+        const redirectToLogin = () => {
+            window.location.href = 'auth.html';
+        };
+        const redirectToHome = () => {
+            window.location.href = 'index.html';
+        };
+
+        // --- Authentication Check ---
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                redirectToLogin();
+                return;
+            }
+            // User is logged in, proceed to load content
+            loadWeeklyMembershipPackages();
+        });
+
+        // --- Load Weekly Membership Packages ---
+        async function loadWeeklyMembershipPackages() {
+            loadingScreen.classList.remove('hidden'); // Ensure loading screen is visible
+
+            try {
+                const membershipsRef = database.ref('weeklyMemberships').orderByChild('order');
+                const snapshot = await membershipsRef.once('value');
+                
+                weeklyPackagesContainer.innerHTML = ''; // Clear existing content
+
+                if (snapshot.exists()) {
+                    let hasActivePackages = false;
+                    snapshot.forEach(childSnapshot => {
+                        const packageData = childSnapshot.val();
+                        const packageId = childSnapshot.key;
+                        if (packageData.isActive) {
+                            hasActivePackages = true;
+                            renderWeeklyItem(packageId, packageData);
+                        }
+                    });
+
+                    if (!hasActivePackages) {
+                        noWeeklyMessage.style.display = 'block';
+                        weeklyPackagesContainer.innerHTML = '<p style="text-align: center; color: var(--subtle-text-color);">কোনো সক্রিয় সাপ্তাহিক প্যাক পাওয়া যায়নি।</p>';
+                    }
+                } else {
+                    noWeeklyMessage.style.display = 'block';
+                    weeklyPackagesContainer.innerHTML = '<p style="text-align: center; color: var(--subtle-text-color);">কোনো সাপ্তাহিক প্যাক পাওয়া যায়নি।</p>';
+                }
+
+            } catch (error) {
+                console.error("Error loading weekly memberships:", error);
+                alert('সাপ্তাহিক প্যাক লোড করতে সমস্যা হয়েছে।');
+                weeklyPackagesContainer.innerHTML = '<p style="text-align: center; color: var(--danger-color);">সাপ্তাহিক প্যাক লোড করতে সমস্যা হয়েছে।</p>';
+            } finally {
+                loadingScreen.classList.add('hidden'); // Hide loading screen
+                weeklyPackMainContent.style.display = 'block'; // Show main content
+                weeklyPackFooter.style.display = 'block'; // Show footer
+            }
+        }
+
+        // --- Render Individual Weekly Item ---
+        function renderWeeklyItem(packageId, packageData) {
+            const packageItem = document.createElement('div');
+            packageItem.className = 'weekly-item';
+            packageItem.dataset.packageId = packageId;
+            packageItem.dataset.name = packageData.name;
+            packageItem.dataset.diamonds = packageData.totalDiamonds; // Use total diamonds for payment flow
+            packageItem.dataset.price = packageData.price;
+            packageItem.innerHTML = `
+                <div class="item-header">
+                    <i class="${packageData.icon || 'fas fa-tag'}"></i> 
+                    <h3>${packageData.name}</h3>
+                    <span class="price">৳ ${packageData.price ? packageData.price.toFixed(2) : '0.00'}</span>
+                </div>
+                <p class="diamonds-info">তাত্ক্ষণিক ডায়মন্ড: <strong>${packageData.diamondsInstant || 0}</strong>, দৈনিক: <strong>${packageData.diamondsDaily || 0}</strong> (মোট ${packageData.durationDays || 0} দিনে: <strong>${packageData.totalDiamonds || 0}</strong>)</p>
+                <ul class="features-list">
+                    ${packageData.features ? packageData.features.map(feature => `<li><i class="fas fa-check-circle"></i> ${feature}</li>`).join('') : ''}
+                </ul>
+            `;
+            weeklyPackagesContainer.appendChild(packageItem);
+        }
+
+        // --- Handle Weekly Package Selection ---
+        weeklyPackagesContainer.addEventListener('click', (e) => {
+            const targetPackage = e.target.closest('.weekly-item');
+            if (targetPackage) {
+                // Remove 'selected' class from all packages
+                document.querySelectorAll('.weekly-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                // Add 'selected' class to the clicked package
+                targetPackage.classList.add('selected');
+                
+                currentSelectedWeeklyPackage = {
+                    id: targetPackage.dataset.packageId,
+                    name: targetPackage.dataset.name,
+                    diamonds: targetPackage.dataset.diamonds, // Total diamonds
+                    price: parseFloat(targetPackage.dataset.price)
+                };
+
+                // Open the UID input modal
+                modalPlayerIdInput.value = ''; // Clear previous input
+                idInputModal.classList.add('active');
+            }
+        });
+
+        // --- Player ID Input Modal Actions ---
+        idInputModal.querySelector('.close-modal').addEventListener('click', () => {
+            idInputModal.classList.remove('active');
+            // Deselect package if user cancels
+            document.querySelectorAll('.weekly-item').forEach(item => item.classList.remove('selected'));
+            currentSelectedWeeklyPackage = null;
+            currentEnteredPlayerId = null;
+        });
+
+        modalCancelIdInputBtn.addEventListener('click', () => {
+            idInputModal.classList.remove('active');
+            // Deselect package if user cancels
+            document.querySelectorAll('.weekly-item').forEach(item => item.classList.remove('selected'));
+            currentSelectedWeeklyPackage = null;
+            currentEnteredPlayerId = null;
+        });
+
+        modalVerifyIdBtn.addEventListener('click', async () => {
+            const uid = modalPlayerIdInput.value.trim();
+            if (!uid) {
+                alert('অনুগ্রহ করে আপনার Free Fire Player ID (UID) দিন।');
+                return;
+            }
+
+            currentEnteredPlayerId = uid;
+            
+            // Store payment details in sessionStorage and redirect to live_pyment.html
+            sessionStorage.setItem('paymentDetails', JSON.stringify({
+                uid: auth.currentUser.uid,
+                playerId: currentEnteredPlayerId,
+                playerName: auth.currentUser.displayName || 'N/A', 
+                diamonds: currentSelectedWeeklyPackage.diamonds,
+                price: currentSelectedWeeklyPackage.price,
+                paymentMethod: 'weekly_pack', // Indicate this is for weekly pack
+                weeklyPackType: currentSelectedWeeklyPackage.name, // Add weekly pack type
+                timestamp: new Date().toISOString()
+            }));
+
+            idInputModal.classList.remove('active');
+            window.location.href = 'live_pyment.html'; // Redirect to payment gateway page
+        });
+
+        // --- General Modal Toggling Logic (for player ID modal) ---
+        const setupModalToggle = (openTriggerSelector, targetElementId, closeTriggerSelector) => {
+            const targetElement = document.getElementById(targetElementId);
+            if (!targetElement) return;
+
+            if (openTriggerSelector) {
+                document.querySelectorAll(openTriggerSelector).forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        targetElement.classList.add('active');
+                    });
+                });
+            }
+            
+            if (closeTriggerSelector) {
+                const closeButton = targetElement.querySelector(closeTriggerSelector);
+                if (closeButton) {
+                    closeButton.addEventListener('click', () => {
+                        targetElement.classList.remove('active');
+                    });
+                }
+            }
+
+            targetElement.addEventListener('click', (e) => {
+                if (e.target === targetElement) {
+                    targetElement.classList.remove('active');
+                }
+            });
+        };
+        // Setup Player ID Modal
+        setupModalToggle(null, 'idInputModal', '#idInputModal .close-modal');
+    </script>
+</body>
+</html>

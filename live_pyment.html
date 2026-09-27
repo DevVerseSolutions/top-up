@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পেমেন্ট করুন - FF TopUp</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #28a745; /* সবুজ */
+            --primary-color-rgb: 40, 167, 69;
+            --secondary-color: #218838; /* গাঢ় সবুজ */
+            --background-color: #f8f9fa; /* হালকা ধূসর ব্যাকগ্রাউন্ড */
+            --card-bg-color: #ffffff; /* সাদা */
+            --text-color: #212529; /* গাঢ় ধূসর */
+            --subtle-text-color: #6c757d; /* ধূসর টেক্সট */
+            --white-color: #ffffff;
+            --danger-color: #dc3545; /* লাল */
+            --price-color: #dc3545;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* হালকা শ্যাডো */
+
+            /* Dynamic Theme Colors (will be set by JS from admin settings) */
+            --theme-header-bg: var(--primary-color); 
+            --theme-header-text: var(--white-color);
+            --theme-accent-color: var(--primary-color);
+            --theme-accent-color-rgb: 40, 167, 69; /* Default RGB for pulse effect */
+            --theme-button-bg: var(--primary-color);
+            --theme-button-text: var(--white-color);
+            --theme-card-border: var(--primary-color);
+            --theme-icon-color: var(--primary-color);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-timer {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            background-color: var(--background-color); 
+            color: var(--text-color); 
+            padding-top: 60px; /* Adjusted for fixed header */
+            padding-bottom: 20px; /* Reduced bottom padding */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: var(--theme-header-bg); /* Dynamic */
+            color: var(--theme-header-text);
+            padding: 10px 15px; /* Reduced padding */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .main-header .back-btn {
+            background: none; border: none; color: var(--theme-header-text);
+            font-size: 18px; /* Reduced font size */
+            cursor: pointer; padding: 5px 10px;
+            transition: transform 0.2s;
+        }
+        .main-header .back-btn:hover { transform: translateX(-5px); }
+        .main-header .page-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px; /* Reduced font size */
+            font-weight: 700;
+            color: var(--theme-header-text);
+            margin: 0;
+            flex-grow: 1; /* Allow title to take space */
+            text-align: center; /* Center the title */
+            transform: translateX(-15px); /* Offset by back button width for true center */
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 10px 10px; /* Reduced padding further */
+            max-width: 350px; /* Further Reduced max-width for a more compact view */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card { 
+            background: var(--card-bg-color); border-radius: 15px; /* Slightly smaller border-radius */
+            padding: 15px; /* Reduced padding */
+            margin-bottom: 10px; /* Reduced margin */
+            box-shadow: var(--shadow); animation: fadeIn 0.5s ease-out forwards; 
+            border: 1px solid var(--theme-card-border); /* Dynamic */
+        }
+        .section-title {
+            font-family: 'Oswald', sans-serif; /* Consistent font with page title */
+            font-size: 17px; /* Reduced font size */
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px; /* Reduced margin */
+            text-align: center;
+        }
+        /* Removed .order-summary styles as the section is removed */
+
+        .payment-instructions-card {
+            margin-top: 5px; /* Reduced top margin */
+        }
+
+        /* Redesigned Payment Info Items - No boxes, Copy icon on right */
+        .payment-info-group {
+            display: flex;
+            flex-direction: column; /* Stack vertically for better readability */
+            margin-bottom: 15px;
+            gap: 10px; /* Gap between items */
+        }
+        .payment-info-item-line { /* New style for single line item */
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Space between label/value and copy icon */
+            padding: 5px 0;
+            position: relative;
+        }
+        .payment-info-item-line .label {
+            font-size: 12px; /* Smaller font for label */
+            color: var(--subtle-text-color);
+            margin-right: 10px; /* Space between label and value */
+            flex-shrink: 0; /* Don't shrink */
+        }
+        .payment-info-item-line .value {
+            font-size: 16px; /* Smaller font for value */
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.2;
+            flex-grow: 1; /* Take up remaining space */
+            text-align: right; /* Align value to right */
+        }
+        .payment-info-item-line .value.amount {
+            color: var(--price-color);
+        }
+        .payment-info-item-line .copy-icon-btn {
+            background: none;
+            border: none;
+            color: var(--subtle-text-color);
+            font-size: 14px; /* Slightly larger for easier click */
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            padding: 5px; /* Add padding for easier click */
+            border-radius: 50%;
+            margin-left: 8px; /* Space from value */
+            flex-shrink: 0;
+        }
+        .payment-info-item-line .copy-icon-btn:hover {
+            color: var(--theme-accent-color); /* Dynamic */
+            transform: scale(1.1);
+        }
+        .payment-info-item-line .copy-icon-btn.copied {
+            color: var(--primary-color); /* Green when copied */
+        }
+
+        .payment-steps ol {
+            list-style-type: decimal;
+            margin-left: 18px; /* Reduced margin */
+            margin-bottom: 15px; /* Reduced margin */
+            font-size: 13px; /* Reduced font size */
+            line-height: 1.5; /* Reduced line height */
+            color: var(--text-color);
+        }
+        .payment-steps ol li {
+            margin-bottom: 6px; /* Reduced margin */
+        }
+        .payment-steps ol li strong {
+            color: var(--theme-accent-color); /* Dynamic */
+        }
+
+        .input-group { /* New styling for grouped inputs */
+            margin-top: 10px; /* Reduced margin */
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 6px; /* Reduced margin */
+            font-weight: 500;
+            font-size: 13px; /* Reduced font size */
+        }
+        .input-group input {
+            width: 100%;
+            padding: 9px; /* Reduced padding */
+            border: 1px solid #ddd;
+            border-radius: 8px; /* Reduced border-radius */
+            font-size: 14px; /* Reduced font size */
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: #f8faff;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--theme-accent-color); /* Dynamic */
+            box-shadow: 0 0 0 3px rgba(var(--theme-accent-color-rgb), 0.25); /* Dynamic */
+        }
+
+        .timer-display {
+            text-align: center;
+            font-size: 15px; /* Reduced font size */
+            font-weight: 700;
+            color: var(--theme-accent-color); /* Dynamic */
+            margin-bottom: 12px; /* Reduced margin */
+            animation: pulse-timer 2s infinite;
+        }
+        .timer-display.expired {
+            color: var(--danger-color);
+            animation: none;
+        }
+
+        .btn-confirm-payment {
+            width: 100%;
+            padding: 10px; /* Reduced padding */
+            border-radius: 10px; /* Reduced border-radius */
+            border: none;
+            font-size: 15px; /* Reduced font size */
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s, opacity 0.2s;
+            margin-top: 15px; /* Reduced margin */
+            background-color: var(--theme-button-bg); /* Dynamic */
+            color: var(--theme-button-text); /* Dynamic */
+        }
+        .btn-confirm-payment:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background-color: var(--secondary-color); /* Darker shade of green for hover, adjust as needed for themes */
+        }
+        .btn-confirm-payment:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .app-footer {
+            text-align: center;
+            padding: 20px 10px; /* Reduced padding */
+            margin-top: 20px; /* Reduced margin */
+            background-color: var(--card-bg-color);
+            border-radius: 15px; /* Reduced border-radius */
+            box-shadow: var(--shadow);
+            color: var(--subtle-text-color);
+            font-size: 13px; /* Reduced font size */
+        }
+        .app-footer h4 {
+            font-size: 15px; /* Reduced font size */
+            color: var(--text-color);
+            margin-bottom: 12px; /* Reduced margin */
+        }
+        .app-footer .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 6px; /* Reduced margin */
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .app-footer .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+        .app-footer p {
+            margin-top: 12px; /* Reduced margin */
+            line-height: 1.4; /* Reduced line height */
+        }
+
+        /* Modal Styles (for final confirmation and success) */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); 
+            z-index: 2000; display: none; align-items: center; justify-content: center; 
+            opacity: 0; transition: opacity 0.3s ease; 
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { 
+            background: var(--card-bg-color); border-radius: 20px; 
+            width: 90%; max-width: 300px; /* Consistent smaller size */
+            padding: 20px; 
+            position: relative; animation: popup-anim 0.3s ease; 
+            text-align: center;
+        }
+        .modal-content .close-modal { 
+            position: absolute; top: 10px; right: 10px; 
+            background: #f1f5f9; border: none; 
+            width: 30px; height: 30px; border-radius: 50%; 
+            font-size: 14px; color: var(--subtle-text-color); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            z-index: 10; transition: transform 0.2s; 
+        }
+        .modal-content .close-modal:hover { transform: scale(1.1); }
+        .modal-content h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        .modal-content p {
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .modal-content strong {
+            color: var(--theme-accent-color); /* Dynamic */
+        }
+        .modal-content .modal-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 10px;
+        }
+        .modal-content .modal-btn.primary { background-color: var(--primary-color); color: var(--white-color); }
+        .modal-content .modal-btn.secondary { background-color: #e9ecef; color: var(--text-color); border: 1px solid #ced4da; }
+        .modal-content .modal-btn:hover { transform: translateY(-2px); }
+
+        /* Success Modal Specific Styles */
+        #successModal .success-icon {
+            font-size: 60px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        #successModal .success-message {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* Initial Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000; /* Above all other content */
+            transition: opacity 0.3s ease;
+        }
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none; /* Make it unclickable */
+        }
+        .loading-spinner-large {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            font-size: 16px;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Initial Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner-large"></div>
+        <p class="loading-text">সেটিংস লোড হচ্ছে...</p>
+    </div>
+
+    <header class="main-header">
+        <button class="back-btn" id="livePaymentBackBtn"><i class="fas fa-arrow-left"></i></button>
+        <h1 class="page-title">পেমেন্ট করুন</h1>
+    </header>
+
+    <main id="paymentMainContent" style="display: none;"> <!-- Hide main content until loaded -->
+        <div class="card payment-instructions-card">
+            <h2 class="section-title" id="paymentMethodTitle"></h2>
+            
+            <div class="timer-display" id="paymentTimer">১০:০০</div>
+
+            <div class="payment-info-group">
+                <div class="payment-info-item-line">
+                    <span class="label" id="merchantNumberLabel"></span>
+                    <span class="value" id="merchantNumber"></span>
+                    <button class="copy-icon-btn" data-target="merchantNumber"><i class="fas fa-copy"></i></button>
+                </div>
+
+                <div class="payment-info-item-line">
+                    <span class="label">আদায়যোগ্য মোট মূল্য</span>
+                    <span class="value amount" id="payableAmount">৳ 0.00</span>
+                </div>
+            </div>
+
+            <div class="payment-steps">
+                <h3>পেমেন্ট করার নিয়মাবলী:</h3>
+                <ol id="paymentStepsList">
+                    <!-- Steps will be dynamically loaded here -->
+                </ol>
+            </div>
+
+            <div class="input-group">
+                <label for="senderMobileNumberInput">যে মোবাইল নম্বর থেকে পেমেন্ট করেছেন:</label>
+                <input type="tel" id="senderMobileNumberInput" placeholder="আপনার মোবাইল নম্বর লিখুন" required>
+            </div>
+
+            <div class="input-group" style="margin-top: 10px;">
+                <label for="transactionIdInput">আপনার ট্রানজেকশন আইডি (TxnID) দিন:</label>
+                <input type="text" id="transactionIdInput" placeholder="এখানে আপনার ট্রানজেকশন আইডি লিখুন" required>
+            </div>
+
+            <button class="btn-confirm-payment" id="preConfirmPaymentBtn" disabled>কনফার্ম করুন</button>
+        </div>
+    </main>
+
+    <footer class="app-footer" id="paymentFooter" style="display: none;"> <!-- Hide footer until loaded -->
+        <h4>FF TopUp</h4>
+        <div class="footer-links">
+            <a href="#">নিয়মাবলী</a>
+            <a href="#">গোপনীয়তা নীতি</a>
+            <a href="#">Refund Policy</a>
+        </div>
+        <p>&copy; 2025 FF TopUp. সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <!-- NEW: Final Confirmation Modal -->
+    <div class="modal-overlay" id="finalConfirmationModal">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h3>অর্ডার চূড়ান্ত করুন</h3>
+            <p>আপনি নিম্নলিখিত তথ্য দিয়ে পেমেন্ট নিশ্চিত করতে যাচ্ছেন:</p>
+            <p>মোবাইল নম্বর: <strong id="finalConfMobile"></strong></p>
+            <p>ট্রানজেকশন আইডি: <strong id="finalConfTxnId"></strong></p>
+            <p class="warning-text" style="color: var(--danger-color); font-weight: 700; margin-top: 10px;">তথ্যগুলো সঠিক আছে কিনা যাচাই করুন!</p>
+            <button class="modal-btn primary" id="confirmFinalPaymentBtn">কনফার্ম করুন</button>
+            <button class="modal-btn secondary" id="backFromFinalConfBtn">ব্যাক করুন</button>
+        </div>
+    </div>
+
+    <!-- NEW: Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <i class="fas fa-check-circle success-icon"></i>
+            <h3 class="success-message">সফলভাবে সম্পন্ন হয়েছে!</h3>
+            <p>আপনার পেমেন্ট অনুরোধ সফলভাবে জমা হয়েছে। অ্যাডমিন নিশ্চিত করার পর ডায়মন্ড যোগ হবে।</p>
+            <!-- No buttons here, auto-redirect or close icon -->
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> <!-- For Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script> <!-- For Realtime Database -->
+
+    <script type="module">
+        const firebaseConfig = {
+  apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
+  authDomain: "ff-topup-1c7b4.firebaseapp.com",
+  databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ff-topup-1c7b4",
+  storageBucket: "ff-topup-1c7b4.firebasestorage.app",
+  messagingSenderId: "319376678545",
+  appId: "1:319376678545:web:18b4e552f0eaf73970e930",
+  measurementId: "G-TEJL6H10X4"
+};
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(app);
+        const database = firebase.database(app);
+
+        // UI elements
+        const paymentMethodTitle = document.getElementById('paymentMethodTitle');
+        const merchantNumberLabel = document.getElementById('merchantNumberLabel');
+        const merchantNumberSpan = document.getElementById('merchantNumber'); 
+        const payableAmountSpan = document.getElementById('payableAmount'); 
+        const paymentStepsList = document.getElementById('paymentStepsList');
+        const senderMobileNumberInput = document.getElementById('senderMobileNumberInput');
+        const transactionIdInput = document.getElementById('transactionIdInput');
+        const preConfirmPaymentBtn = document.getElementById('preConfirmPaymentBtn'); 
+        const paymentTimer = document.getElementById('paymentTimer');
+        const livePaymentBackBtn = document.getElementById('livePaymentBackBtn'); 
+        const loadingScreen = document.getElementById('loadingScreen');
+        const paymentMainContent = document.getElementById('paymentMainContent');
+        const paymentFooter = document.getElementById('paymentFooter');
+
+        // New Modal elements
+        const finalConfirmationModal = document.getElementById('finalConfirmationModal');
+        const finalConfMobile = document.getElementById('finalConfMobile');
+        const finalConfTxnId = document.getElementById('finalConfTxnId');
+        const confirmFinalPaymentBtn = document.getElementById('confirmFinalPaymentBtn'); 
+        const backFromFinalConfBtn = document.getElementById('backFromFinalConfBtn');
+        const successModal = document.getElementById('successModal');
+
+        let timerInterval;
+        const PAYMENT_DURATION_SECONDS = 10 * 60; // 10 minutes
+        let paymentDetails = null; 
+        
+        // Function to convert hex to RGB for CSS custom properties
+        function hexToRgb(hex) {
+            let r = 0, g = 0, b = 0;
+            if (!hex || typeof hex !== 'string' || hex.length < 4) return '40, 167, 69'; // Default to primary-color-rgb if invalid hex
+
+            // handle 3-digit hex
+            if (hex.length === 4) {
+                r = parseInt(hex[1] + hex[1], 16);
+                g = parseInt(hex[2] + hex[2], 16);
+                b = parseInt(hex[3] + hex[3], 16);
+            }
+            // handle 6-digit hex
+            else if (hex.length === 7) {
+                r = parseInt(hex.substring(1, 3), 16);
+                g = parseInt(hex.substring(3, 5), 16);
+                b = parseInt(hex.substring(5, 7), 16);
+            }
+            return `${r}, ${g}, ${b}`;
+        }
+
+        // Function to load admin payment settings from Firebase
+        async function loadAdminPaymentSettings() {
+            try {
+                const snapshot = await database.ref('adminSettings/paymentMethods').once('value');
+                const adminSettings = snapshot.val();
+                if (!adminSettings) {
+                    console.warn("Admin payment settings not found in Firebase.");
+                    return null; 
+                }
+                return adminSettings;
+            } catch (error) {
+                console.error("Error loading admin payment settings:", error);
+                return null;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Show loading screen immediately
+            loadingScreen.classList.remove('hidden');
+
+            const loadedSettings = await loadAdminPaymentSettings();
+
+            const paymentDetailsString = sessionStorage.getItem('paymentDetails');
+            if (!paymentDetailsString) {
+                alert('পেমেন্ট বিস্তারিত পাওয়া যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                window.location.href = 'index.html'; 
+                return;
+            }
+
+            paymentDetails = JSON.parse(paymentDetailsString);
+            
+            const currentMethodSettings = loadedSettings ? loadedSettings[paymentDetails.paymentMethod] : null;
+
+            // --- Conditional Access & Display based on Admin Settings ---
+            if (!currentMethodSettings || !currentMethodSettings.merchantNumber || currentMethodSettings.isActive === false) { 
+                alert('এই পেমেন্ট পদ্ধতিটি বর্তমানে সেট আপ করা নেই অথবা নিষ্ক্রিয় আছে।');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Set CSS custom properties for dynamic theming from admin settings
+            document.documentElement.style.setProperty('--theme-header-bg', currentMethodSettings.color || 'var(--primary-color)');
+            document.documentElement.style.setProperty('--theme-accent-color-rgb', hexToRgb(currentMethodSettings.color || '#28a745'));
+            document.documentElement.style.setProperty('--theme-accent-color', currentMethodSettings.color || 'var(--primary-color)');
+            document.documentElement.style.setProperty('--theme-button-bg', currentMethodSettings.color || 'var(--primary-color)');
+            document.documentElement.style.setProperty('--theme-icon-color', currentMethodSettings.color || 'var(--primary-color)');
+
+
+            // Populate Payment Details 
+            paymentMethodTitle.textContent = currentMethodSettings.methodName ? `${currentMethodSettings.methodName} নির্দেশিকা` : `${paymentDetails.methodName || paymentDetails.paymentMethod} পেমেন্ট নির্দেশিকা`; // Use methodName
+            payableAmountSpan.textContent = `৳ ${paymentDetails.price.toFixed(2)}`;
+
+            merchantNumberSpan.textContent = currentMethodSettings.merchantNumber;
+            
+            // Conditionally show/hide merchant label and set its text
+            if (currentMethodSettings.showMerchantLabel === false) {
+                merchantNumberLabel.style.display = 'none';
+            } else {
+                merchantNumberLabel.style.display = 'block';
+                merchantNumberLabel.textContent = `${currentMethodSettings.accountType || 'অ্যাকাউন্ট'} নম্বর:`; 
+            }
+
+            // Populate instructions from admin settings
+            if (currentMethodSettings.instructions && Array.isArray(currentMethodSettings.instructions)) {
+                paymentStepsList.innerHTML = currentMethodSettings.instructions.map(step => {
+                    let formattedStep = step.replace(/\[PRICE\]/g, paymentDetails.price.toFixed(2));
+                    formattedStep = formattedStep.replace(/\[MERCHANT_NUMBER\]/g, currentMethodSettings.merchantNumber);
+                    formattedStep = formattedStep.replace(/\[PAYMENT_TYPE\]/g, currentMethodSettings.paymentType || 'পেমেন্ট');
+                    formattedStep = formattedStep.replace(/\[ACCOUNT_TYPE\]/g, currentMethodSettings.accountType || 'অ্যাকাউন্ট');
+                    return `<li>${formattedStep}</li>`;
+                }).join('');
+            } else {
+                paymentStepsList.innerHTML = `<li>পেমেন্ট নির্দেশাবলী পাওয়া যায়নি। অনুগ্রহ করে এডমিনের সাথে যোগাযোগ করুন।</li>`;
+            }
+
+            // Copy button functionality for merchant number
+            document.querySelectorAll('.copy-icon-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        const textToCopy = targetElement.textContent;
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            button.classList.add('copied');
+                            alert('কপি হয়েছে!'); // Show browser alert
+                            setTimeout(() => {
+                                button.classList.remove('copied');
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy text: ', err);
+                            alert('কপি করতে ব্যর্থ হয়েছে। ম্যানুয়ালি কপি করুন।');
+                        });
+                    }
+                });
+            });
+
+            // Input validation for enabling pre-confirm button (both fields must have text)
+            const checkInputs = () => {
+                if (senderMobileNumberInput.value.trim().length > 0 && transactionIdInput.value.trim().length > 0) {
+                    preConfirmPaymentBtn.disabled = false;
+                } else {
+                    preConfirmPaymentBtn.disabled = true;
+                }
+            };
+            senderMobileNumberInput.addEventListener('input', checkInputs);
+            transactionIdInput.addEventListener('input', checkInputs);
+
+
+            // Timer functionality
+            let timeLeft = PAYMENT_DURATION_SECONDS;
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                paymentTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    paymentTimer.textContent = 'সময় শেষ! পুনরায় চেষ্টা করুন।';
+                    paymentTimer.classList.add('expired');
+                    preConfirmPaymentBtn.disabled = true;
+                    senderMobileNumberInput.disabled = true; 
+                    transactionIdInput.disabled = true;
+                    alert('পেমেন্টের সময় শেষ হয়ে গেছে। অনুগ্রহ করে আবার শুরু করুন।');
+                    // Optionally redirect to home or offer to restart
+                    // window.location.href = 'index.html'; 
+                }
+                timeLeft--;
+            }, 1000);
+
+            // Back button with confirmation
+            livePaymentBackBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('আপনি কি সত্যিই ব্যাক করতে চান? আপনার বর্তমান পেমেন্ট প্রক্রিয়া বাতিল হয়ে যাবে।')) {
+                    window.history.back();
+                }
+            });
+
+
+            // First "কনফার্ম করুন" Button (opens final confirmation modal)
+            preConfirmPaymentBtn.addEventListener('click', () => {
+                const senderMobileNumber = senderMobileNumberInput.value.trim();
+                const transactionId = transactionIdInput.value.trim();
+
+                if (!senderMobileNumber || !transactionId) {
+                    alert('অনুগ্রহ করে মোবাইল নম্বর এবং ট্রানজেকশন আইডি উভয়ই দিন।');
+                    return;
+                }
+
+                // Populate final confirmation modal
+                finalConfMobile.textContent = senderMobileNumber;
+                finalConfTxnId.textContent = transactionId;
+                finalConfirmationModal.classList.add('active');
+            });
+
+            // "Back" button in final confirmation modal
+            backFromFinalConfBtn.addEventListener('click', () => {
+                finalConfirmationModal.classList.remove('active');
+            });
+
+            // Close final confirmation modal (cross icon)
+            finalConfirmationModal.querySelector('.close-modal').addEventListener('click', () => {
+                finalConfirmationModal.classList.remove('active');
+            });
+
+
+            // Final "কনফার্ম করুন" Button (commits payment)
+            confirmFinalPaymentBtn.addEventListener('click', async () => {
+                const senderMobileNumber = finalConfMobile.textContent; 
+                const transactionId = finalConfTxnId.textContent; 
+
+                if (!auth.currentUser) {
+                    alert('আপনি লগইন অবস্থায় নেই। পেমেন্ট নিশ্চিত করতে লগইন করুন।');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                // Disable button to prevent multiple submissions
+                confirmFinalPaymentBtn.disabled = true;
+                confirmFinalPaymentBtn.textContent = 'প্রক্রিয়াকরণ হচ্ছে...';
+
+                try {
+                    const newOrderRef = database.ref('orders').push();
+                    await newOrderRef.set({
+                        uid: paymentDetails.uid,
+                        playerId: paymentDetails.playerId,
+                        playerName: paymentDetails.playerName,
+                        diamonds: paymentDetails.diamonds,
+                        price: paymentDetails.price,
+                        paymentMethod: paymentDetails.paymentMethod,
+                        senderPhoneNumber: senderMobileNumber, 
+                        transactionId: transactionId,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        status: 'pending' // Admin needs to confirm
+                    });
+                    console.log('Order saved to Firebase with ID:', newOrderRef.key);
+                    
+                    finalConfirmationModal.classList.remove('active'); 
+                    successModal.classList.add('active'); 
+
+                    sessionStorage.removeItem('paymentDetails'); 
+                    clearInterval(timerInterval); 
+
+                    // Redirect after a short delay to show success message
+                    setTimeout(() => {
+                        successModal.classList.remove('active');
+                        window.location.href = 'history.html'; 
+                    }, 3000); 
+
+                } catch (error) {
+                    console.error('Error saving order:', error);
+                    alert('পেমেন্ট নিশ্চিত করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                    confirmFinalPaymentBtn.disabled = false; 
+                    confirmFinalPaymentBtn.textContent = 'কনফার্ম করুন';
+                    finalConfirmationModal.classList.remove('active'); 
+                }
+            });
+
+            // Close success modal (cross icon)
+            successModal.querySelector('.close-modal').addEventListener('click', () => {
+                successModal.classList.remove('active');
+                window.location.href = 'history.html'; 
+            });
+
+            // Hide loading screen and show content after all setup is done
+            loadingScreen.classList.add('hidden');
+            paymentMainContent.style.display = 'block';
+            paymentFooter.style.display = 'block';
+        });
+
+        // Ensure timer stops and details clear on page unload (e.g., if user navigates back)
+        window.addEventListener('beforeunload', () => {
+            clearInterval(timerInterval);
+        });
+    </script>
+</body>
+</html>

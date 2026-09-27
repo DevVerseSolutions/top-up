@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>হেল্প সেন্টার - FF TopUp</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #28a745; /* সবুজ */
+            --primary-color-rgb: 40, 167, 69; /* RGB for #28a745 for pulse effect */
+            --secondary-color: #218838; /* গাঢ় সবুজ */
+            --background-color: #f8f9fa; /* হালকা ধূসর ব্যাকগ্রাউন্ড */
+            --card-bg-color: #ffffff; /* সাদা */
+            --text-color: #212529; /* গাঢ় ধূসর */
+            --subtle-text-color: #6c757d; /* ধূসর টেক্সট */
+            --white-color: #ffffff;
+            --danger-color: #dc3545; /* লাল */
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* হালকা শ্যাডো */
+
+            /* New CSS variables for fixed bottom area height calculation */
+            --fixed-bottom-area-padding-bottom: 15px; /* Outer padding for the whole fixed area */
+            --input-area-inner-height: calc(12px * 2 + 16px); /* padding-top + font-size + padding-bottom for input */
+            --chat-input-area-height: calc(var(--input-area-inner-height) + 15px /* padding-top */ + 10px /* padding-bottom */);
+            --bottom-nav-height: 60px;
+            --fixed-bottom-total-height: calc(var(--chat-input-area-height) + var(--bottom-nav-height) + var(--fixed-bottom-area-padding-bottom));
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popup-anim { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes typing-dots {
+            0%, 80%, 100% { transform: initial; }
+            40% { transform: translateY(-4px); }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            background-color: var(--background-color); 
+            color: var(--text-color); 
+            padding-top: 75px; /* Adjusted top padding for fixed header */ 
+            padding-bottom: 0; /* Ensures fixed bottom nav stays at the bottom */ 
+            display: flex; /* Make body a flex container for full height layout */
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative; /* For fixed children to be relative to body */
+        }
+        
+        /* Main Fixed Header Styles (Consistent) */
+        .main-header {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%); 
+            width: 95%; max-width: 420px; 
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); 
+            border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+            z-index: 1000; 
+            padding: 8px 15px; 
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px; 
+        }
+        .main-header .logo-container {
+            display: flex; align-items: center;
+            height: 44px; 
+            min-width: auto; 
+            justify-content: center;
+            border-radius: 12px; 
+            background-color: #f0fdf0; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04); 
+            padding: 0 10px; 
+        }
+        .main-header .logo-text { 
+            font-family: 'Oswald', sans-serif; 
+            font-size: 22px; 
+            font-weight: 700;
+            color: var(--primary-color); 
+            white-space: nowrap;
+            letter-spacing: 0.5px; 
+            text-shadow: 1px 1px 1px rgba(var(--primary-color-rgb), 0.1); 
+        }
+        .main-header .menu-icon {
+            font-size: 22px; 
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 10px; 
+            height: 44px; 
+            width: 44px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #f0fdf0; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04); 
+        }
+        .main-header .menu-icon:hover {
+            background-color: rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Main content area */
+        .main-content { 
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 0 15px; 
+            flex-grow: 1; /* Allows main content to take available height */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            /* Adjust margin-bottom to clear the new fixed-bottom-area */
+            margin-bottom: var(--fixed-bottom-total-height);
+        }
+        .card.chat-container { 
+            background: var(--card-bg-color); border-radius: 20px; 
+            padding: 20px; 
+            box-shadow: var(--shadow); animation: fadeIn 0.5s ease-out forwards; 
+            flex-grow: 1; /* Take full height of main-content */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Important to contain internal scrolling */
+            position: relative;
+            margin-top: 25px; /* Pushes card down from fixed header */
+            margin-bottom: 0; /* Remove default card margin-bottom */
+        }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: var(--text-color); }
+        
+        /* Chat Interface Styles */
+        .chat-box {
+            flex-grow: 1; /* Allows chat-box to take available space */
+            overflow-y: auto; /* Enables scrolling for messages */
+            padding-right: 10px; /* For scrollbar */
+            /* margin-bottom: 15px; -- removed, as input is now in fixed bottom area */
+            display: flex;
+            flex-direction: column;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        .chat-box::-webkit-scrollbar { width: 8px; }
+        .chat-box::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .chat-box::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        .chat-box::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .chat-message {
+            margin-bottom: 5px; /* Further reduced margin for compactness */
+            max-width: 80%; /* Reduced max-width for better wrapping */
+            padding: 8px 12px; /* Reduced padding for compactness */
+            border-radius: 15px;
+            line-height: 1.4;
+            word-wrap: break-word; /* Legacy support */
+            overflow-wrap: break-word; /* Modern equivalent */
+            word-break: break-all; /* Aggressive word break for long strings without spaces */
+            font-size: 14px; /* Reduced font size for compactness */
+            position: relative;
+        }
+        .message-ai {
+            background-color: #e6ffe6; /* Light green for AI */
+            align-self: flex-start;
+            color: var(--text-color);
+            border-bottom-left-radius: 5px;
+        }
+        .message-user {
+            background-color: var(--primary-color);
+            align-self: flex-end;
+            color: var(--white-color);
+            border-bottom-right-radius: 5px;
+        }
+        .message-timestamp {
+            font-size: 9px; /* Smaller timestamp */
+            color: var(--subtle-text-color);
+            margin-top: 2px; /* Reduced margin */
+            display: block;
+            text-align: right; 
+            opacity: 0.7;
+            position: absolute; /* Keep timestamp inside bubble */
+            bottom: 3px;
+            right: 8px; /* For user messages */
+        }
+        .message-ai .message-timestamp {
+            text-align: left;
+            left: 8px; /* For AI messages */
+            right: auto;
+        }
+        .message-ai.typing-indicator {
+            background-color: #f0f0f0;
+            color: var(--subtle-text-color);
+            font-style: italic;
+            border-bottom-left-radius: 5px;
+            padding-right: 25px; 
+            display: flex;
+            align-items: center;
+            width: fit-content; /* Make typing indicator fit content */
+            max-width: 150px; /* Limit width */
+        }
+        .typing-indicator span:not(.message-timestamp) { /* For the dots themselves */
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin: 0 1px;
+            background-color: var(--subtle-text-color);
+            border-radius: 50%;
+            animation: typing-dots 1.4s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0s; }
+
+
+        .ai-dynamic-options { /* Container for AI-generated buttons */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px; /* Reduced gap for compactness */
+            margin-top: 8px; /* Space from AI text */
+            align-self: flex-start; /* Align with AI message */
+            margin-left: -5px; /* Adjust alignment to match message-ai */
+        }
+        .ai-dynamic-option-btn { /* Apply to AI generated buttons */
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 15px; /* More rounded */
+            padding: 6px 10px; /* Reduced padding */
+            font-size: 13px; /* Reduced font size */
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-color);
+            font-family: 'Noto Sans Bengali', sans-serif;
+            flex-shrink: 0;
+            white-space: nowrap; /* Prevent breaking */
+        }
+        .ai-dynamic-option-btn:hover {
+            background-color: #e0e0e0;
+            border-color: var(--primary-color);
+        }
+
+        /* Fixed bottom area containing input and navigation */
+        .fixed-bottom-area {
+            position: fixed;
+            bottom: 0; /* Stick to the bottom of the viewport */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 420px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* Apply shadow here */
+            border-radius: 20px 20px 0 0; /* Match card radius for aesthetics */
+            background: rgba(255, 255, 255, 0.9); /* Background for the whole fixed area */
+            backdrop-filter: blur(12px); /* Blur for the whole fixed area */
+            padding-bottom: var(--fixed-bottom-area-padding-bottom); /* Outer padding from the screen bottom */
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #eee; /* Retain border for separation */
+            padding-top: 15px;
+            padding-bottom: 10px; /* Space between input and nav */
+            flex-shrink: 0; 
+            /* background-color: transparent; Don't need if fixed-bottom-area has background */
+        }
+        .chat-input-area input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: #f8faff;
+        }
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25);
+        }
+        .chat-input-area button {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .chat-input-area button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            margin-left: 5px; /* Align with AI message */
+            align-self: flex-start; /* Align with AI message */
+        }
+        .feedback-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--subtle-text-color);
+            transition: color 0.2s, transform 0.2s;
+            padding: 3px 5px;
+            border-radius: 5px;
+        }
+        .feedback-btn:hover {
+            transform: translateY(-2px);
+            color: var(--primary-color);
+            background-color: #e9ecef;
+        }
+        .feedback-btn.liked {
+            color: var(--primary-color);
+        }
+        .feedback-btn.disliked {
+            color: var(--danger-color);
+        }
+
+        /* Bottom Navigation Bar (Now inside fixed-bottom-area) */
+        .bottom-nav { 
+            /* Removed fixed positioning, it's now a child of fixed-bottom-area */
+            position: static; 
+            width: 100%; 
+            background: transparent; /* Parent handles background */
+            backdrop-filter: none; /* Parent handles blur */
+            display: flex; justify-content: space-around; align-items: center; 
+            height: var(--bottom-nav-height); 
+            border-radius: 0; /* No need for separate border-radius here */
+            padding: 0 10px; 
+            box-shadow: none; /* Parent handles shadow */
+            z-index: auto; 
+        }
+        .nav-item-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            text-decoration: none; color: #aaa; transition: color 0.3s; 
+            padding: 5px 0; 
+        }
+        .nav-item i { font-size: 20px; }
+        .nav-item span { font-size: 11px; margin-top: 3px; } 
+        .nav-item:hover, .nav-item.active { color: var(--primary-color); }
+
+        /* Popup Menu Overlay (Consistent) */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); 
+            z-index: 2000; display: none; align-items: center; justify-content: center; 
+            opacity: 0; transition: opacity 0.3s ease; 
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { 
+            background: var(--card-bg-color); border-radius: 20px; 
+            width: 90%; max-width: 350px; padding: 25px; 
+            position: relative; animation: popup-anim 0.3s ease; 
+        }
+        .close-popup, .close-modal { 
+            position: absolute; top: 15px; right: 15px; 
+            background: #f1f5f9; border: none; 
+            width: 35px; height: 35px; border-radius: 50%; 
+            font-size: 16px; color: var(--subtle-text-color); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            z-index: 10; transition: transform 0.2s; 
+        }
+        .close-popup:hover, .close-modal:hover { transform: scale(1.1); }
+        
+        .popup-profile { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 15px; }
+        .popup-profile img { width: 60px; height: 60px; border-radius: 50%; }
+        .popup-profile-details .name { font-size: 20px; font-weight: 700; }
+        .popup-profile-details .edit-profile { font-size: 14px; color: var(--primary-color); text-decoration: none; font-weight: 500; }
+        .popup-profile-details .edit-profile i { margin-right: 5px; }
+        .popup-nav-list a { display: flex; align-items: center; text-decoration: none; color: var(--text-color); padding: 15px; border-radius: 12px; transition: background-color 0.2s; }
+        .popup-nav-list a:hover { background-color: #f0f2f5; }
+        .popup-nav-list i { font-size: 20px; color: var(--primary-color); width: 40px; }
+        .popup-nav-list span { font-size: 16px; font-weight: 500; }
+        .popup-nav-list a.logout { color: var(--danger-color); }
+        .popup-nav-list a.logout i { color: var(--danger-color); }
+
+
+        /* Footer Styles (Consistent, but outside main-content) */
+        /* Consider removing this footer if not needed, as fixed-bottom-area is the new bottom */
+        .app-footer {
+            text-align: center;
+            padding: 25px 15px;
+            margin-top: 30px;
+            background-color: var(--card-bg-color);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            color: var(--subtle-text-color);
+            font-size: 14px;
+        }
+        .app-footer h4 {
+            font-size: 16px;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+        .app-footer .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 8px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .app-footer .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+        .app-footer p {
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Fixed Header -->
+    <header class="main-header">
+        <div class="logo-container">
+            <span class="logo-text">FF TopUp</span>
+        </div>
+        <div class="auth-area" id="headerAuthArea">
+            <!-- Content changes based on login state (JS handles this) -->
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="card chat-container">
+            <div class="chat-box" id="chatBox">
+                <!-- Chat messages will be dynamically added here -->
+            </div>
+            <!-- chat-input-area is moved out of here -->
+        </div>
+    </main>
+
+    <!-- New Fixed Bottom Area for Input and Navigation -->
+    <div class="fixed-bottom-area">
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="আপনার সমস্যা লিখুন...">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+        <!-- Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <div class="nav-item-wrapper"><a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>হোম</span></a></div>
+            <div class="nav-item-wrapper"><a href="offers.html" class="nav-item"><i class="fas fa-tags"></i><span>অফার</span></a></div>
+            <div class="nav-item-wrapper"><a href="tutorial.html" class="nav-item"><i class="fas fa-book"></i><span>টিউটোরিয়াল</span></a></div>
+            <div class="nav-item-wrapper"><a href="history.html" class="nav-item"><i class="fas fa-history"></i><span>অর্ডার</span></a></div>
+            <div class="nav-item-wrapper"><a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a></div>
+        </div>
+    </div>
+
+    <!-- Popup Menu Overlay (for general settings/menu triggered by header menu icon) -->
+    <div class="modal-overlay" id="popupMenuOverlay">
+        <div class="modal-content">
+            <button class="close-popup" id="closePopupBtn"><i class="fas fa-times"></i></button>
+            <div class="popup-profile">
+                <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=N" alt="Profile" id="popupProfileAvatar">
+                <div class="popup-profile-details">
+                    <p class="name" id="popupDisplayName">নাহিদ</p>
+                    <a href="profile.html" class="edit-profile"> <i class="fas fa-pencil-alt"></i> প্রোফাইল এডিট</a>
+                </div>
+            </div>
+            <nav class="popup-nav-list">
+                <a href="wallet.html"><i class="fas fa-wallet"></i> <span>আমার ওয়ালেট</span></a>
+                <a href="history.html"><i class="fas fa-history"></i> <span>লেনদেনের ইতিহাস</span></a>
+                <a href="refer.html"><i class="fas fa-users"></i> <span>রেফার করুন</span></a>
+                <a href="#" class="logout" id="logoutLink"><i class="fas fa-sign-out-alt"></i> <span>লগআউট</span></a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> <!-- For Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script> <!-- For Realtime Database -->
+
+    <script type="module">
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+  apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
+  authDomain: "ff-topup-1c7b4.firebaseapp.com",
+  databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ff-topup-1c7b4",
+  storageBucket: "ff-topup-1c7b4.firebasestorage.app",
+  messagingSenderId: "319376678545",
+  appId: "1:319376678545:web:18b4e552f0eaf73970e930",
+  measurementId: "G-TEJL6H10X4"
+};
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const analytics = firebase.analytics(app);
+        const auth = firebase.auth(app); // Get Auth instance
+        const database = firebase.database(app); // Get Realtime Database instance
+
+        // --- UI Elements ---
+        const headerAuthArea = document.getElementById('headerAuthArea');
+        const popupProfileAvatar = document.getElementById('popupProfileAvatar');
+        const popupDisplayName = document.getElementById('popupDisplayName');
+        const logoutLink = document.getElementById('logoutLink');
+        
+        // Chat elements
+        const chatBox = document.getElementById('chatBox');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        const CHAT_HISTORY_KEY = 'ff_topup_chat_history';
+        const AI_RESPONSE_DELAY = 1000; // 1 second delay for AI typing effect
+        const HISTORY_EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+        let currentLoadedHistory = []; // To store history messages temporarily
+
+        // --- Chat Functions ---
+        function getTimestamp() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function appendMessage(messageContent, sender, timestamp = null, options = [], messageId = null) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', `message-${sender}`);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = messageContent;
+
+            messageElement.appendChild(contentDiv);
+
+            if (options.length > 0 && sender === 'ai') { // Only show dynamic options for AI messages
+                const optionsContainer = document.createElement('div');
+                optionsContainer.classList.add('ai-dynamic-options');
+                options.forEach(optionData => {
+                    const btn = document.createElement('button');
+                    btn.classList.add('ai-dynamic-option-btn');
+                    
+                    const optionText = typeof optionData === 'string' ? optionData : optionData.text;
+                    const optionLink = typeof optionData === 'object' && optionData.link ? optionData.link : null;
+
+                    btn.textContent = optionText;
+                    
+                    if (optionLink) {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            window.open(optionLink, '_blank');
+                            handleUserMessage(optionText); // Simulate user sending this message for history
+                        });
+                    } else {
+                        btn.addEventListener('click', () => handleUserMessage(optionText));
+                    }
+                    optionsContainer.appendChild(btn);
+                });
+                messageElement.appendChild(optionsContainer);
+            }
+
+            // Add feedback buttons for AI messages
+            if (sender === 'ai') {
+                const feedbackContainer = document.createElement('div');
+                feedbackContainer.classList.add('feedback-buttons');
+                
+                const likeBtn = document.createElement('button');
+                likeBtn.classList.add('feedback-btn');
+                likeBtn.innerHTML = '<i class="far fa-thumbs-up"></i>';
+                likeBtn.title = 'Useful';
+                likeBtn.dataset.feedbackType = 'like';
+                likeBtn.addEventListener('click', (e) => handleFeedback(e, messageId, 'like'));
+
+                const dislikeBtn = document.createElement('button');
+                dislikeBtn.classList.add('feedback-btn');
+                dislikeBtn.innerHTML = '<i class="far fa-thumbs-down"></i>';
+                dislikeBtn.title = 'Not useful';
+                dislikeBtn.dataset.feedbackType = 'dislike';
+                dislikeBtn.addEventListener('click', (e) => handleFeedback(e, messageId, 'dislike'));
+
+                feedbackContainer.appendChild(likeBtn);
+                feedbackContainer.appendChild(dislikeBtn);
+                messageElement.appendChild(feedbackContainer);
+            }
+
+            const timestampSpan = document.createElement('span');
+            timestampSpan.classList.add('message-timestamp');
+            timestampSpan.textContent = timestamp || getTimestamp();
+            messageElement.appendChild(timestampSpan);
+
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+        }
+
+        function showTypingIndicator() {
+            const typingElement = document.createElement('div');
+            typingElement.classList.add('chat-message', 'message-ai', 'typing-indicator');
+            typingElement.id = 'typingIndicator';
+            typingElement.innerHTML = `টাইপিং করছে... <span></span><span></span><span></span> <span class="message-timestamp">${getTimestamp()}</span>`;
+            chatBox.appendChild(typingElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingElement = document.getElementById('typingIndicator');
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+
+        function handleFeedback(event, messageId, feedbackType) {
+            const button = event.currentTarget;
+            const parent = button.closest('.feedback-buttons');
+
+            parent.querySelectorAll('.feedback-btn').forEach(btn => {
+                btn.classList.remove('liked', 'disliked');
+                btn.querySelector('i').classList.remove('fas');
+                btn.querySelector('i').classList.add('far');
+            });
+
+            button.classList.add(feedbackType === 'like' ? 'liked' : 'disliked');
+            button.querySelector('i').classList.remove('far');
+            button.querySelector('i').classList.add('fas');
+
+            console.log(`Feedback for message ${messageId}: ${feedbackType}`);
+            // Here you would typically send this feedback to your server
+            // e.g., fetch('/api/feedback', { method: 'POST', body: JSON.stringify({ messageId, feedbackType }) });
+        }
+
+
+        async function handleUserMessage(userMessage) {
+            if (!userMessage.trim()) return;
+
+            appendMessage(userMessage, 'user');
+            chatInput.value = ''; // Clear input
+
+            saveChatHistory(); // Save user message immediately
+
+            showTypingIndicator(); // Show typing indicator
+
+            setTimeout(async () => {
+                removeTypingIndicator(); // Remove typing indicator after delay
+                const aiResponse = await getAiResponse(userMessage);
+                const messageId = Date.now().toString(); // Simple ID for feedback tracking
+                appendMessage(aiResponse.text, 'ai', null, aiResponse.options, messageId);
+                saveChatHistory(); // Save after AI response
+            }, AI_RESPONSE_DELAY);
+        }
+
+        async function getAiResponse(userMessage) {
+            const lowerCaseMessage = userMessage.toLowerCase();
+            let userName = "ভিজিটর";
+            let currentUser = auth.currentUser;
+            let userData = null;
+
+            if (currentUser) {
+                try {
+                    const userSnapshot = await database.ref('users/' + currentUser.uid).once('value');
+                    userData = userSnapshot.val();
+                    if (userData && userData.fullName) {
+                        userName = userData.fullName;
+                    } else if (currentUser.displayName) {
+                        userName = currentUser.displayName;
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data in getAiResponse:", error);
+                }
+            }
+
+            // Removed 'অর্ডার ইতিহাস' from generalOptions as per request
+            const generalOptions = [
+                'টপ-আপ সমস্যা', 'ব্যালেন্স দেখুন', 'রেফারেল স্ট্যাটাস', 'অন্যান্য প্রশ্ন'
+            ];
+            const supportOptions = [
+                { text: 'WhatsApp সাপোর্ট', link: 'https://wa.me/8801796549955' },
+                { text: 'Telegram সাপোর্ট', link: 'https://t.me/mdnahid44' }
+            ];
+
+            let aiResponseText = "";
+            let aiResponseOptions = [];
+
+            // --- Greeting Responses ---
+            if (lowerCaseMessage.includes("hello") || lowerCaseMessage.includes("hi") || lowerCaseMessage.includes("আসসালামু আলাইকুম") || lowerCaseMessage.includes("salam") || lowerCaseMessage.includes("শুভেচ্ছা")) {
+                aiResponseText = `ওয়ালাইকুম আসসালাম / হ্যালো ${userName}, আমি FF TopUp এর AI সহকারী। আপনার কি সমস্যা জানতে পারি?`;
+                aiResponseOptions = generalOptions;
+            } else if (lowerCaseMessage.includes("কেমন আছেন") || lowerCaseMessage.includes("kemon achen") || lowerCaseMessage.includes("ki khobor") || lowerCaseMessage.includes("কি খবর") || lowerCaseMessage.includes("how are you")) {
+                aiResponseText = `আমি একটি ডিজিটাল সহকারী হিসেবে আপনার সেবায় নিয়োজিত। আমি ভালো আছি, ধন্যবাদ। আপনার কি ধরনের সাহায্য প্রয়োজন?`;
+                aiResponseOptions = generalOptions;
+            } else if (lowerCaseMessage.includes("apnar nam ki") || lowerCaseMessage.includes("তোমার নাম কি") || lowerCaseMessage.includes("who are you")) {
+                aiResponseText = `আমি FF TopUp এর AI সহকারী। আমি আপনাকে বিভিন্ন তথ্য এবং সমস্যা সমাধানে সাহায্য করতে পারি।`;
+                aiResponseOptions = ['আপনি কি কি করতে পারেন?', 'আপনার সাথে কথা বলতে চাই'];
+            } else if (lowerCaseMessage.includes("ধন্যবাদ") || lowerCaseMessage.includes("thanks") || lowerCaseMessage.includes("thank you")) {
+                aiResponseText = `আপনাকে স্বাগতম! আরও কোনো প্রশ্ন থাকলে নির্দ্বিধায় জিজ্ঞাসা করুন।`;
+                aiResponseOptions = generalOptions;
+            }
+
+            // --- User Data Specific Responses (Requires Login) ---
+            else if (lowerCaseMessage.includes("ব্যালেন্স দেখুন") || lowerCaseMessage.includes("balance") || lowerCaseMessage.includes("টাকা") || lowerCaseMessage.includes("আমার ব্যালেন্স")) {
+                if (currentUser) {
+                    const balance = userData && userData.balance !== undefined ? userData.balance : 0;
+                    aiResponseText = `আপনার বর্তমান ব্যালেন্স: ৳ <b>${balance.toFixed(2)}</b>।`;
+                    aiResponseOptions = ['ডিপোজিট করতে চাই', 'টপ-আপ করতে চাই', {text: 'লেনদেনের ইতিহাস', link: 'history.html'}];
+                } else {
+                    aiResponseText = `আপনার ব্যালেন্স দেখতে হলে অনুগ্রহ করে <a href="auth.html" style="color: var(--primary-color); text-decoration: underline;">লগইন করুন</a>।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}, 'পরে দেখব'];
+                }
+            }
+            else if (lowerCaseMessage.includes("রেফারেল স্ট্যাটাস") || lowerCaseMessage.includes("referral") || lowerCaseMessage.includes("রেফার")) {
+                if (currentUser) {
+                    const referralCode = userData ? userData.referralCode : 'N/A';
+                    let totalReferrals = 0;
+                     if (referralCode !== 'N/A') {
+                        const referredUsersSnapshot = await database.ref('users').orderByChild('referredBy').equalTo(referralCode).once('value');
+                        referredUsersSnapshot.forEach(() => { totalReferrals++; });
+                     }
+                    aiResponseText = `আপনার রেফারেল কোড: <b>${referralCode}</b>। আপনি এ পর্যন্ত <b>${totalReferrals}</b> জনকে রেফার করেছেন।`;
+                    aiResponseOptions = [{text: 'রেফারেল প্রোগ্রাম কী?', link: 'refer.html'}, 'আমার রেফারেল লিঙ্ক দিন', 'অন্যান্য প্রশ্ন'];
+                } else {
+                    aiResponseText = `আপনার রেফারেল স্ট্যাটাস দেখতে হলে অনুগ্রহ করে <a href="auth.html" style="color: var(--primary-color); text-decoration: underline;">লগইন করুন</a>।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}];
+                }
+            }
+            else if (lowerCaseMessage.includes("আমার নাম") || lowerCaseMessage.includes("my name")) {
+                 if (currentUser) {
+                    const fullName = userData && userData.fullName ? userData.fullName : currentUser.displayName || 'N/A';
+                    aiResponseText = `আপনার প্রোফাইলের নাম: <b>${fullName}</b>।`;
+                    aiResponseOptions = [{text: 'প্রোফাইল এডিট করুন', link: 'profile.html'}, 'ইমেইল পরিবর্তন করুন'];
+                } else {
+                    aiResponseText = `আপনার নাম জানতে হলে অনুগ্রহ করে <a href="auth.html" style="color: var(--primary-color); text-decoration: underline;">লগইন করুন</a>।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}];
+                }
+            }
+
+            // --- Problem-specific Responses ---
+            else if (lowerCaseMessage.includes("টপ-আপ সমস্যা") || lowerCaseMessage.includes("topup problem") || lowerCaseMessage.includes("টপআপ") || lowerCaseMessage.includes("diamond na asle") || lowerCaseMessage.includes("টপ আপ") || lowerCaseMessage.includes("not receive diamond")) {
+                aiResponseText = `টপ-আপ সংক্রান্ত সমস্যার জন্য, অনুগ্রহ করে আপনার <b>অর্ডার আইডি</b> এবং <b>Player ID (UID)</b> প্রস্তুত রাখুন। আমাদের প্রতিনিধিকে বিস্তারিত জানাতে সরাসরি যোগাযোগ করতে পারেন:`;
+                aiResponseOptions = supportOptions.concat(['আমার অর্ডার আইডি কোথায় পাবো?']);
+            }
+            // Explicitly handling "অর্ডার ইতিহাস" when typed, even if not a default button
+            else if (lowerCaseMessage.includes("অর্ডার ইতিহাস") || lowerCaseMessage.includes("order history") || lowerCaseMessage.includes("আমার অর্ডার")) {
+                if (currentUser) {
+                    aiResponseText = `আপনার অর্ডারের ইতিহাস দেখতে অনুগ্রহ করে <a href="history.html" style="color: var(--primary-color); text-decoration: underline;">অর্ডার পেজে</a> যান।`;
+                    aiResponseOptions = [{text: 'অর্ডার দেখুন', link: 'history.html'}, 'একটি অর্ডার বাতিল করুন', {text: 'লেনদেনের ইতিহাস', link: 'history.html'}];
+                } else {
+                    aiResponseText = `আপনার অর্ডারের ইতিহাস দেখতে হলে অনুগ্রহ করে <a href="auth.html" style="color: var(--primary-color); text-decoration: underline;">লগইন করুন</a>।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}];
+                }
+            }
+            else if (lowerCaseMessage.includes("পাসওয়ার্ড রিসেট") || lowerCaseMessage.includes("password reset") || lowerCaseMessage.includes("পাসওয়ার্ড ভুলে গেছি") || lowerCaseMessage.includes("password change")) {
+                if (currentUser && currentUser.email) {
+                    aiResponseText = `আপনার পাসওয়ার্ড রিসেট করার জন্য, আপনার রেজিস্টার্ড ইমেইলে একটি লিঙ্ক পাঠানো হবে। অনুগ্রহ করে <a href="profile.html" style="color: var(--primary-color); text-decoration: underline;">প্রোফাইল পেজে</a> গিয়ে "পাসওয়ার্ড পরিবর্তন করুন" অপশনটি ব্যবহার করুন।`;
+                    aiResponseOptions = [{text: 'প্রোফাইল দেখুন', link: 'profile.html'}, 'ইমেইল পরিবর্তন করুন'];
+                } else {
+                    aiResponseText = `আপনার পাসওয়ার্ড রিসেট করতে হলে অনুগ্রহ করে <a href="auth.html?form=forgot-password" style="color: var(--primary-color); text-decoration: underline;">লগইন/রেজিস্টার পেজের</a> পাসওয়ার্ড ভুলে গেছেন অপশনটি ব্যবহার করুন।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}, 'অন্যান্য প্রশ্ন'];
+                }
+            }
+            else if (lowerCaseMessage.includes("অন্যান্য প্রশ্ন") || lowerCaseMessage.includes("other issue") || lowerCaseMessage.includes("ami jani na") || lowerCaseMessage.includes("help me")) {
+                 aiResponseText = `অন্যান্য সমস্যার জন্য, আপনি কী জানতে চান তা স্পষ্ট করে বলুন। অথবা, নিচে দেওয়া অপশনগুলো থেকে আপনার সমস্যাটি নির্বাচন করুন। সরাসরি মানব সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন:`;
+                 aiResponseOptions = generalOptions.concat(supportOptions);
+            }
+            else if (lowerCaseMessage.includes("কিভাবে টপ-আপ করব?") || lowerCaseMessage.includes("how to topup")) {
+                 aiResponseText = `ফ্রি ফায়ার ডায়মন্ড টপ-আপ করার প্রক্রিয়া জানতে অনুগ্রহ করে আমাদের <a href="tutorial.html" style="color: var(--primary-color); text-decoration: underline;">টিউটোরিয়াল পেজটি</a> দেখুন।`;
+                 aiResponseOptions = [{text: 'টিউটোরিয়াল দেখুন', link: 'tutorial.html'}, {text: 'টপ-আপ পেজ', link: 'index.html'}];
+            }
+            else if (lowerCaseMessage.includes("whatsapp সাপোর্ট") || lowerCaseMessage.includes("telegram সাপোর্ট")) {
+                aiResponseText = `ঠিক আছে, আপনি আমাদের প্রতিনিধিদের সাথে সরাসরি যোগাযোগ করতে পারেন। নিচে দেওয়া লিঙ্কগুলোতে ক্লিক করুন:`;
+                aiResponseOptions = supportOptions.concat(['অন্যান্য প্রশ্ন']);
+            }
+            else if (lowerCaseMessage.includes("ডিপোজিট করতে চাই") || lowerCaseMessage.includes("add money") || lowerCaseMessage.includes("টাকা জমা দেব")) {
+                if (currentUser) {
+                    aiResponseText = `আপনি আমাদের ওয়ালেট পেজ থেকে সহজেই টাকা ডিপোজিট করতে পারবেন। অনুগ্রহ করে <a href="wallet.html" style="color: var(--primary-color); text-decoration: underline;">ওয়ালেট পেজে</a> যান।`;
+                    aiResponseOptions = [{text: 'আমার ওয়ালেট', link: 'wallet.html'}, 'ডিপোজিটের নিয়মাবলী'];
+                } else {
+                    aiResponseText = `টাকা ডিপোজিট করতে হলে অনুগ্রহ করে <a href="auth.html" style="color: var(--primary-color); text-decoration: underline;">লগইন করুন</a>।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}];
+                }
+            }
+            else if (lowerCaseMessage.includes("টপ-আপ করতে চাই") || lowerCaseMessage.includes("buy diamond") || lowerCaseMessage.includes("ডায়মন্ড কিনবো")) {
+                aiResponseText = `আমাদের টপ-আপ পেজে গিয়ে আপনার পছন্দের প্যাকেজটি নির্বাচন করে টপ-আপ করতে পারবেন। <a href="index.html" style="color: var(--primary-color); text-decoration: underline;">এখানে ক্লিক করুন</a>।`;
+                aiResponseOptions = [{text: 'হোম পেজে যান', link: 'index.html'}, {text: 'অফার দেখুন', link: 'offers.html'}];
+            }
+            else if (lowerCaseMessage.includes("রেফারেল প্রোগ্রাম কী?") || lowerCaseMessage.includes("what is referral program")) {
+                aiResponseText = `আমাদের রেফারেল প্রোগ্রামের মাধ্যমে আপনি বন্ধুদের রেফার করে কমিশন উপার্জন করতে পারবেন। বিস্তারিত জানতে <a href="refer.html" style="color: var(--primary-color); text-decoration: underline;">রেফার পেজে</a> যান।`;
+                aiResponseOptions = ['রেফারেল স্ট্যাটাস', 'আমার রেফারেল লিঙ্ক দিন', 'অন্যান্য প্রশ্ন'];
+            }
+            else if (lowerCaseMessage.includes("আমার রেফারেল লিঙ্ক দিন")) {
+                if (currentUser) {
+                    const referralCode = userData ? userData.referralCode : 'N/A';
+                    const referralLink = `${window.location.origin}/register?ref=${referralCode}`;
+                    aiResponseText = `আপনার রেফারেল লিঙ্ক হলো: <b><a href="${referralLink}" target="_blank" style="color: var(--primary-color); text-decoration: underline;">${referralLink}</a></b>। এটি বন্ধুদের সাথে শেয়ার করুন!`;
+                    aiResponseOptions = ['রেফারেল স্ট্যাটাস', 'রেফারেল প্রোগ্রাম কী?'];
+                } else {
+                    aiResponseText = `আপনার রেফারেল লিঙ্ক পেতে হলে অনুগ্রহ করে <a href="auth.html" style="color: var(--primary-color); text-decoration: underline;">লগইন করুন</a>।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}];
+                }
+            }
+            else if (lowerCaseMessage.includes("প্রোফাইল এডিট করুন") || lowerCaseMessage.includes("profile edit")) {
+                if (currentUser) {
+                    aiResponseText = `আপনি আপনার প্রোফাইল তথ্য পরিবর্তন করতে <a href="profile.html" style="color: var(--primary-color); text-decoration: underline;">প্রোফাইল পেজে</a> যেতে পারেন।`;
+                    aiResponseOptions = [{text: 'আমার নাম', link: 'profile.html'}, 'পাসওয়ার্ড রিসেট'];
+                } else {
+                    aiResponseText = `প্রোফাইল এডিট করতে হলে অনুগ্রহ করে <a href="auth.html" style="color: var(--primary-color); text-decoration: underline;">লগইন করুন</a>।`;
+                    aiResponseOptions = [{text: 'লগইন করুন', link: 'auth.html'}, {text: 'রেজিস্টার করুন', link: 'auth.html?form=register'}];
+                }
+            }
+
+            else {
+                // --- Fallback Response ---
+                aiResponseText = `আমি আপনার প্রশ্নটি বুঝতে পারিনি। আপনি কি অন্যভাবে বলতে পারবেন? অথবা, নিচে দেওয়া অপশনগুলো থেকে আপনার সমস্যাটি নির্বাচন করুন। সরাসরি মানব সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন:`;
+                aiResponseOptions = generalOptions.concat(supportOptions);
+            }
+
+            return { text: aiResponseText, options: aiResponseOptions };
+        }
+
+        // Custom greeting for when valid history is found
+        async function getAiResponseForHistoryGreeting(userName) {
+            const generalOptions = [
+                'টপ-আপ সমস্যা', 'ব্যালেন্স দেখুন', 'রেফারেল স্ট্যাটাস', 'অন্যান্য প্রশ্ন'
+            ];
+            return {
+                text: `ওয়ালাইকুম আসসালাম / হ্যালো ${userName}, আমি FF TopUp এর AI সহকারী। আপনার নতুন কি প্রশ্ন আছে?`,
+                options: generalOptions
+            };
+        }
+
+
+        // --- Local Storage for Chat History ---
+        function saveChatHistory() {
+            const messages = [];
+            document.querySelectorAll('#chatBox .chat-message').forEach(msgElement => {
+                if (!msgElement.classList.contains('typing-indicator')) {
+                    const contentDiv = msgElement.querySelector('.chat-message > div:first-child');
+                    const textContent = contentDiv ? contentDiv.innerHTML : '';
+                    const sender = msgElement.classList.contains('message-ai') ? 'ai' : 'user';
+                    const timestamp = msgElement.querySelector('.message-timestamp').textContent;
+                    messages.push({
+                        text: textContent, 
+                        sender: sender,
+                        timestamp: timestamp
+                    });
+                }
+            });
+            localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify({
+                messages: messages,
+                lastActivity: Date.now() // Store current timestamp
+            }));
+        }
+
+        async function loadChatHistoryAndShowInitialGreeting() {
+            chatBox.innerHTML = ''; // Clear chatbox first
+
+            const savedData = localStorage.getItem(CHAT_HISTORY_KEY);
+            let hasValidHistory = false;
+            let userName = "ভিজিটর"; // Default, will be updated by updateUI
+
+            // Get user name for initial greeting
+            let currentUser = auth.currentUser;
+            if (currentUser) {
+                try {
+                    const userSnapshot = await database.ref('users/' + currentUser.uid).once('value');
+                    const userData = userSnapshot.val();
+                    if (userData && userData.fullName) {
+                        userName = userData.fullName;
+                    } else if (currentUser.displayName) {
+                        userName = currentUser.displayName;
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data in loadChatHistoryAndShowInitialGreeting:", error);
+                }
+            }
+
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    const messages = parsedData.messages || [];
+                    const lastActivity = parsedData.lastActivity || 0;
+
+                    if (Date.now() - lastActivity < HISTORY_EXPIRATION_TIME && messages.length > 0) {
+                        currentLoadedHistory = messages; // Store for later display
+                        hasValidHistory = true;
+                    } else {
+                        // History is too old or empty, clear it
+                        localStorage.removeItem(CHAT_HISTORY_KEY);
+                    }
+                } catch (e) {
+                    console.error("Error parsing chat history from local storage:", e);
+                    localStorage.removeItem(CHAT_HISTORY_KEY); // Clear corrupt data
+                }
+            }
+
+            if (hasValidHistory) {
+                // Show initial greeting + a button to view history
+                const initialAiResponse = await getAiResponseForHistoryGreeting(userName); // Custom greeting for history scenario
+                const messageId = Date.now().toString();
+                appendMessage(initialAiResponse.text, 'ai', null, initialAiResponse.options, messageId);
+
+                // Add a "View Previous Conversations" button
+                const viewHistoryBtnWrapper = document.createElement('div');
+                viewHistoryBtnWrapper.classList.add('ai-dynamic-options'); // Reuse styling for options
+                viewHistoryBtnWrapper.style.marginTop = '15px'; // Separate from greeting options
+                const viewHistoryBtn = document.createElement('button');
+                viewHistoryBtn.classList.add('ai-dynamic-option-btn');
+                viewHistoryBtn.textContent = 'পূর্ববর্তী কথোপকথন দেখুন';
+                viewHistoryBtn.id = 'viewHistoryButton';
+                viewHistoryBtn.addEventListener('click', displayPreviousHistory);
+                chatBox.appendChild(viewHistoryBtnWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+            } else {
+                // No valid history, start fresh
+                const initialAiResponse = await getAiResponse("hello"); // Use standard initial greeting
+                const messageId = Date.now().toString();
+                appendMessage(initialAiResponse.text, 'ai', null, initialAiResponse.options, messageId);
+            }
+            // Note: saveChatHistory() is called after appendMessage in this flow, which will update the timestamp for the initial message.
+        }
+
+        function displayPreviousHistory() {
+            currentLoadedHistory.forEach(msg => {
+                // When displaying old history, do not generate new options or feedback buttons
+                // Just append the saved text content.
+                appendMessage(msg.text, msg.sender, msg.timestamp);
+            });
+            // Remove the "View Previous Conversations" button after history is displayed
+            const viewHistoryBtn = document.getElementById('viewHistoryButton');
+            if (viewHistoryBtn && viewHistoryBtn.parentNode) {
+                viewHistoryBtn.parentNode.remove();
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+
+        // --- Event Listeners ---
+        sendBtn.addEventListener('click', () => handleUserMessage(chatInput.value));
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUserMessage(chatInput.value);
+            }
+        });
+
+        // --- Authentication & UI Updates for Header/Popup ---
+        async function updateUI(user) {
+            headerAuthArea.innerHTML = ''; 
+
+            let userDisplayName = "ভিজিটর"; // Default for AI greeting in chat
+
+            if (user) {
+                let displayNameForHeader = user.displayName || "ব্যবহারকারী";
+                const MAX_NAME_LENGTH = 6; 
+
+                try {
+                    const userSnapshot = await database.ref('users/' + user.uid).once('value');
+                    const userData = userSnapshot.val();
+                    
+                    let fullUserName = user.displayName || 'ব্যবহারকারী';
+                    if (userData && userData.fullName) {
+                        fullUserName = userData.fullName;
+                        userDisplayName = fullUserName; // Set for AI greeting
+                        if (fullUserName.length > MAX_NAME_LENGTH) {
+                            displayNameForHeader = fullUserName.substring(0, MAX_NAME_LENGTH - 1) + '...';
+                        } else {
+                            displayNameForHeader = fullUserName;
+                        }
+                    } else {
+                         if (displayNameForHeader.length > MAX_NAME_LENGTH) {
+                            displayNameForHeader = displayNameForHeader.substring(0, MAX_NAME_LENGTH - 1) + '...';
+                        }
+                        userDisplayName = displayNameForHeader; // If only Auth displayName
+                    }
+                    
+                    const userAvatar = (userData && userData.photoURL) || user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${fullUserName}`;
+                    
+                    headerAuthArea.innerHTML = `<div class="menu-icon" id="headerMenuIcon"><i class="fas fa-bars"></i></div>`;
+                    document.getElementById('headerMenuIcon').addEventListener('click', () => {
+                        document.getElementById('popupMenuOverlay').classList.add('active');
+                    });
+
+                    popupProfileAvatar.src = userAvatar;
+                    popupDisplayName.textContent = fullUserName;
+                    logoutLink.style.display = 'flex';
+
+
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                    // Fallback UI
+                    headerAuthArea.innerHTML = `<div class="menu-icon" id="headerMenuIcon"><i class="fas fa-bars"></i></div>`;
+                     document.getElementById('headerMenuIcon').addEventListener('click', () => {
+                        document.getElementById('popupMenuOverlay').classList.add('active');
+                    });
+                    popupProfileAvatar.src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=Guest`;
+                    popupDisplayName.textContent = 'অতিথি';
+                    logoutLink.style.display = 'none';
+                    userDisplayName = "ভিজিটর";
+                }
+
+            } else {
+                // User is signed out.
+                headerAuthArea.innerHTML = ``;
+                popupProfileAvatar.src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=Guest`;
+                popupDisplayName.textContent = `অতিথি`;
+                logoutLink.style.display = 'none';
+                userDisplayName = "ভিজিটর";
+            }
+        }
+
+        // Listen for auth state changes and initial load
+        auth.onAuthStateChanged(async (user) => {
+            await updateUI(user); // Wait for UI update, especially for userName
+            await loadChatHistoryAndShowInitialGreeting(); 
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const setupModalToggle = (openTriggerSelector, targetElementId, closeTriggerSelector) => {
+                const targetElement = document.getElementById(targetElementId);
+                if (!targetElement) return;
+
+                if (openTriggerSelector) {
+                    document.querySelectorAll(openTriggerSelector).forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            targetElement.classList.add('active');
+                        });
+                    });
+                }
+                
+                if (closeTriggerSelector) {
+                    const closeButton = targetElement.querySelector(closeTriggerSelector);
+                    if (closeButton) {
+                        closeButton.addEventListener('click', () => {
+                            targetElement.classList.remove('active');
+                        });
+                    }
+                }
+
+                targetElement.addEventListener('click', (e) => {
+                    if (e.target === targetElement) {
+                        targetElement.classList.remove('active');
+                    }
+                });
+            };
+
+            setupModalToggle(null, 'popupMenuOverlay', '#closePopupBtn');
+
+            const handleLogout = async (e) => {
+                e.preventDefault();
+                try {
+                    await auth.signOut();
+                    alert('আপনি সফলভাবে লগআউট করেছেন!');
+                    document.getElementById('popupMenuOverlay').classList.remove('active'); 
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    alert('লগআউট করতে সমস্যা হয়েছে।');
+                }
+            };
+            logoutLink.addEventListener('click', handleLogout); 
+
+            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(1) a').href = 'index.html'; // Home
+            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(2) a').href = 'offers.html'; // Offer
+            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(3) a').href = 'tutorial.html'; // Tutorial
+            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(4) a').href = 'history.html'; // Order
+            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(5) a').href = 'profile.html'; // Profile
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Diamond Top-Up - FF TopUp</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #28a745;
+            --primary-color-rgb: 40, 167, 69;
+            --secondary-color: #218838;
+            --background-color: #f8f9fa;
+            --card-bg-color: #ffffff;
+            --text-color: #212529;
+            --subtle-text-color: #6c757d;
+            --white-color: #ffffff;
+            --danger-color: #dc3545;
+            --price-color: #dc3545;
+            --verified-blue: #1d9bf0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popup-anim { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pulse-help {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(var(--primary-color-rgb), 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0); }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            background-color: var(--background-color); 
+            color: var(--text-color); 
+            padding-top: 75px; 
+            padding-bottom: 100px; 
+        }
+        
+        /* Main Fixed Header */
+        .main-header {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%); 
+            width: 95%; max-width: 420px; 
+            background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); 
+            border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+            z-index: 1000; padding: 8px 15px; 
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px; 
+        }
+        .main-header .logo-container {
+            display: flex; align-items: center; height: 44px;
+            border-radius: 12px; background-color: #f0fdf0; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04); padding: 0 10px; 
+        }
+        .main-header .logo-text { 
+            font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
+            color: var(--primary-color); white-space: nowrap; letter-spacing: 0.5px; 
+        }
+        .main-header .menu-icon {
+            font-size: 22px; cursor: pointer; color: var(--primary-color);
+            padding: 10px; height: 44px; width: 44px; 
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; transition: all 0.2s ease;
+            background-color: #f0fdf0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); 
+        }
+
+        .main-content { padding: 0 15px; padding-top: 15px; max-width: 420px; margin: 0 auto; }
+        .card { 
+            background: var(--card-bg-color); border-radius: 20px; 
+            padding: 22px; margin-bottom: 22px; 
+            box-shadow: var(--shadow); animation: fadeIn 0.4s ease-out forwards; 
+        }
+
+        /* Live Scrolling Marquee Bar */
+        .marquee-container {
+            background: #fff3cd; border: 1px solid #ffeeba;
+            border-radius: 12px; padding: 8px 12px; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 8px; font-size: 13px; color: #856404;
+        }
+        .marquee-badge {
+            background: #f59e0b; color: #ffffff;
+            font-size: 11px; font-weight: 700; padding: 2px 7px;
+            border-radius: 6px; flex-shrink: 0;
+        }
+        .marquee-text-wrap {
+            overflow: hidden; white-space: nowrap; width: 100%;
+        }
+        .marquee-text-wrap marquee {
+            margin: 0; font-weight: 500;
+        }
+
+        /* User Info Card */
+        .user-profile-balance-card {
+            background-color: var(--card-bg-color);
+            border-radius: 20px; padding: 14px 18px;
+            box-shadow: var(--shadow); display: flex;
+            justify-content: space-between; align-items: center;
+            margin-bottom: 20px; animation: fadeIn 0.4s ease-out forwards;
+        }
+        .user-profile-balance-card .user-info-left {
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+        }
+        .user-profile-balance-card .user-info-left img {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+        .user-profile-balance-card .user-info-details .name {
+            font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 5px;
+        }
+        .user-profile-balance-card .balance-display {
+            background-color: #f1fef4; color: var(--primary-color);
+            height: 38px; border-radius: 20px; padding: 0 14px;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: 700; font-size: 14px; text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;
+        }
+
+        /* Image Banner Slider */
+        .image-slider-container {
+            width: 100%; max-width: 420px; margin: 0 auto 22px auto; 
+            border-radius: 20px; overflow: hidden; position: relative;
+            box-shadow: var(--shadow); height: 180px; 
+            background: #e2e8f0;
+        }
+        .slider-wrapper {
+            display: flex; transition: transform 0.4s ease-in-out; height: 100%;
+        }
+        .slider-item-content {
+            flex: 0 0 100%; height: 100%; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .slider-item-content a {
+            display: block; width: 100%; height: 100%;
+        }
+        .slider-image-item {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .slider-nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.45); color: var(--white-color);
+            border: none; cursor: pointer; z-index: 10; font-size: 16px;
+            border-radius: 50%; width: 34px; height: 34px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .arrow-left { left: 8px; }
+        .arrow-right { right: 8px; }
+
+        /* Diamond Grid */
+        .diamond-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px;
+        } 
+        .package-item { 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 8px 10px; min-height: 65px; position: relative;
+            border: 1px solid #e2e8f0; border-radius: 12px;
+            background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .package-item:hover, .package-item.selected { 
+            border-color: var(--primary-color); transform: translateY(-2px);
+        }
+        .package-item.selected {
+            background-color: var(--primary-color); color: #ffffff;
+        }
+        .diamond-info { 
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            font-size: 14px; font-weight: 700; color: var(--text-color); margin-bottom: 4px;
+        }
+        .package-item.selected .diamond-info { color: #ffffff; }
+        .diamond-info i { font-size: 15px; color: var(--primary-color); }
+        .package-item.selected .diamond-info i { color: #ffffff; }
+        .diamond-price { 
+            position: absolute; bottom: 5px; right: 8px;
+            font-size: 10px; font-weight: 700; color: var(--price-color); 
+            background: rgba(255,255,255,0.9); padding: 1px 4px; border-radius: 4px;
+        }
+        .package-item.selected .diamond-price {
+            color: #ffffff; background: rgba(0,0,0,0.25);
+        }
+
+        .section-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+
+        /* Dynamic Other Packages Grid */
+        .other-packages-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px;
+        }
+        .other-package-item {
+            background-color: var(--card-bg-color); border-radius: 18px;
+            box-shadow: var(--shadow); text-align: center; padding: 12px 10px;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: space-between; min-height: 170px; cursor: pointer;
+            border: 1px solid #eef2f5; transition: transform 0.2s;
+        }
+        .other-package-item:hover { transform: translateY(-3px); }
+        .other-package-item .pkg-img-wrap {
+            width: 100%; height: 85px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 6px;
+        }
+        .other-package-item img {
+            max-width: 90%; max-height: 85px; object-fit: contain; margin: 0 auto;
+            border-radius: 8px;
+        }
+        .other-package-item .package-title-english {
+            font-size: 13.5px; font-weight: 700; margin: 6px 0; color: var(--text-color);
+        }
+        .other-package-item .btn-enter {
+            background-color: #f1f5f9; color: var(--primary-color);
+            padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
+            border: 1px solid #dee2e6; pointer-events: none;
+        }
+
+        /* Promotion Card */
+        .promotion-card { 
+            background: linear-gradient(135deg, #e6ffe6, #ccffcc);
+            border: 1px solid #99ff99; color: #1a5e20;
+        } 
+        .promotion-card i { font-size: 28px; color: var(--primary-color); margin-bottom: 8px; }
+        .promotion-card h3 { color: var(--secondary-color); font-size: 18px; margin-bottom: 4px; }
+        .promotion-card p { font-size: 13px; color: #3d7a42; margin-bottom: 15px; line-height: 1.4; }
+        .promotion-card .btn-group { display: flex; gap: 10px; }
+        .promotion-card .btn { flex: 1; padding: 10px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 13.5px; text-align: center; }
+        .btn.create-job { background-color: var(--primary-color); color: white; } 
+        .btn.view-jobs { background-color: #fff; color: var(--primary-color); border: 1px solid var(--primary-color); } 
+
+        /* Disclaimer Card */
+        .disclaimer-card {
+            background-color: #fff3cd; border: 1px solid #ffeeba;
+            border-radius: 18px; padding: 16px; margin-bottom: 22px;
+            color: #856404; font-size: 13px;
+        }
+        .disclaimer-card h3 { font-size: 15px; margin-bottom: 8px; }
+        .disclaimer-card ul { padding-left: 18px; margin: 0; line-height: 1.5; }
+        .disclaimer-card ul li { margin-bottom: 4px; }
+
+        /* Floating Help */
+        .help-button-wrapper { position: fixed; right: 20px; bottom: 95px; z-index: 999; }
+        .help-button {
+            background: var(--primary-color); color: var(--white-color);
+            width: 52px; height: 52px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse-help 2s infinite; 
+        }
+
+        /* Bottom Nav */
+        .bottom-nav { 
+            position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); 
+            width: 95%; max-width: 420px; 
+            background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); 
+            display: flex; justify-content: space-around; align-items: center; 
+            height: 58px; border-radius: 30px; padding: 0 10px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 1000; 
+        }
+        .nav-item-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            text-decoration: none; color: #aaa; padding: 4px 0; 
+        }
+        .nav-item i { font-size: 19px; }
+        .nav-item span { font-size: 11px; margin-top: 3px; } 
+        .nav-item.active { color: var(--primary-color); }
+
+        /* Modals */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); 
+            z-index: 2000; display: none; align-items: center; justify-content: center; 
+            opacity: 0; transition: opacity 0.3s ease; 
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { 
+            background: var(--card-bg-color); border-radius: 22px; 
+            width: 90%; max-width: 320px; padding: 22px; 
+            position: relative; animation: popup-anim 0.3s ease; 
+        }
+        .close-modal, .close-popup { 
+            position: absolute; top: 12px; right: 12px; 
+            background: #f1f5f9; border: none; width: 30px; height: 30px; 
+            border-radius: 50%; font-size: 14px; color: var(--subtle-text-color); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+        }
+        .modal-form-group { margin-bottom: 12px; }
+        .modal-form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+        .modal-form-group input[type="text"] {
+            width: 100%; padding: 11px; border: 1px solid #ddd;
+            border-radius: 10px; font-size: 15px; outline: none; background: #f8faff;
+        }
+        .modal-btn {
+            width: 100%; padding: 11px; border-radius: 12px; border: none;
+            font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px;
+        }
+        .modal-btn.primary { background-color: var(--primary-color); color: var(--white-color); }
+        .modal-btn.secondary { background-color: #e9ecef; color: var(--text-color); }
+
+        /* Payment Buttons */
+        .payment-method-btn {
+            padding: 8px 6px; border-radius: 10px; border: 1px solid #e0e0e0;
+            background: #f8f9fa; cursor: pointer; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex: 1;
+        }
+        .payment-method-btn.selected-payment-method {
+            border-color: var(--primary-color); background: #e6ffe6;
+        }
+        .payment-method-btn img { max-width: 32px; height: auto; margin-bottom: 3px; }
+
+        /* Maintenance Screen Overlay */
+        #maintenanceScreen {
+            position: fixed; inset: 0; background: #0f172a; color: #ffffff;
+            z-index: 99999; display: none; align-items: center; justify-content: center;
+            flex-direction: column; text-align: center; padding: 25px;
+        }
+        #maintenanceScreen i { font-size: 55px; color: #f59e0b; margin-bottom: 15px; }
+        #maintenanceScreen h2 { font-size: 22px; margin-bottom: 8px; }
+        #maintenanceScreen p { color: #94a3b8; font-size: 14px; max-width: 320px; line-height: 1.5; }
+
+        /* Footer */
+        .app-footer {
+            text-align: center; padding: 22px 15px; margin-top: 25px;
+            background-color: var(--card-bg-color); border-radius: 20px;
+            box-shadow: var(--shadow); color: var(--subtle-text-color); font-size: 13px;
+        }
+        .app-footer h4 { font-size: 15px; color: var(--text-color); margin-bottom: 10px; }
+        .app-footer .footer-links a { color: var(--primary-color); text-decoration: none; margin: 0 6px; font-weight: 500; }
+        .app-footer p { margin-top: 8px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+    <!-- Maintenance Screen -->
+    <div id="maintenanceScreen">
+        <i class="fas fa-tools"></i>
+        <h2>সাইট রক্ষণাবেক্ষণ চলছে</h2>
+        <p>আমরা সিস্টেম আপগ্রেড করছি। খুব শীঘ্রই আবার লাইভে আসবো।</p>
+    </div>
+
+    <!-- Main Fixed Header -->
+    <header class="main-header">
+        <div class="logo-container">
+            <span class="logo-text" id="siteLogoText">FF TopUp</span>
+        </div>
+        <div class="auth-area" id="headerAuthArea"></div>
+    </header>
+
+    <main class="main-content">
+        <!-- Live Scrolling Marquee Notice -->
+        <div class="marquee-container" id="marqueeNoticeContainer" style="display: none;">
+            <span class="marquee-badge">জরুরি</span>
+            <div class="marquee-text-wrap">
+                <marquee id="marqueeNoticeText" scrollamount="4"></marquee>
+            </div>
+        </div>
+
+        <!-- User Info & Balance Card -->
+        <div class="user-profile-balance-card" id="userProfileBalanceCard" style="display: none;">
+            <div class="user-info-left" id="userProfileSummaryClickable">
+                <img src="https://api.dicebear.com/9.x/initials/svg?seed=N" alt="Profile" id="userProfileAvatar">
+                <div class="user-info-details">
+                    <p class="name" id="userDisplayName">User <span class="verified-badge-small"><i class="fas fa-check-circle" style="color: var(--verified-blue);"></i></span></p>
+                </div>
+            </div>
+            <a href="#" class="balance-display" id="userBalanceDisplay">৳ 0.00</a>
+        </div>
+
+        <!-- Image Banner Slider -->
+        <div class="image-slider-container">
+            <div class="slider-wrapper" id="sliderWrapper">
+                <div class="slider-item-content">
+                    <div style="color: #64748b; font-size: 13px;"><i class="fas fa-spinner fa-spin"></i> ব্যানার লোড হচ্ছে...</div>
+                </div>
+            </div>
+            <button class="slider-nav-arrow arrow-left" id="prevSlideBtn"><i class="fas fa-chevron-left"></i></button>
+            <button class="slider-nav-arrow arrow-right" id="nextSlideBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Diamond Packages Section -->
+        <div class="card diamond-packages-card">
+            <h2 class="section-title">ডায়মন্ড প্যাক নির্বাচন করুন</h2>
+            <div class="diamond-grid" id="diamondPackages">
+                <p style="text-align: center; color: var(--subtle-text-color); grid-column: span 2;">ডায়মন্ড প্যাক লোড হচ্ছে...</p>
+            </div>
+        </div>
+        
+        <!-- Other Packages Section (Controlled Dynamically via Admin Panel Image URLs) -->
+        <div class="card other-packages-card">
+            <h2 class="section-title">অন্যান্য প্যাকেজ</h2>
+            <div class="other-packages-grid">
+                <!-- Monthly Membership -->
+                <div class="other-package-item" data-href="monthly_pass.html">
+                    <div class="pkg-img-wrap">
+                        <img id="imgMonthly" src="https://img.freepik.com/free-vector/gradient-diamond-card-template_23-2149090623.jpg" alt="Monthly Membership">
+                    </div>
+                    <p class="package-title-english">Monthly Membership</p>
+                    <button class="btn-enter">প্রবেশ করুন <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <!-- Weekly Pack -->
+                <div class="other-package-item" data-href="weekly_pack.html">
+                    <div class="pkg-img-wrap">
+                        <img id="imgWeekly" src="https://img.freepik.com/free-vector/abstract-digital-card-design_1017-30441.jpg" alt="Weekly Pack">
+                    </div>
+                    <p class="package-title-english">Weekly Pack</p>
+                    <button class="btn-enter">প্রবেশ করুন <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <!-- Level Up Pass -->
+                <div class="other-package-item" data-href="level_up_pass.html">
+                    <div class="pkg-img-wrap">
+                        <img id="imgLevelUp" src="https://img.freepik.com/free-vector/golden-trophy-cup-composition_1284-33155.jpg" alt="Level Up Pass">
+                    </div>
+                    <p class="package-title-english">Level Up Pass</p>
+                    <button class="btn-enter">প্রবেশ করুন <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <!-- Airdrop Offer -->
+                <div class="other-package-item" data-href="airdrop_offer.html">
+                    <div class="pkg-img-wrap">
+                        <img id="imgAirdrop" src="https://img.freepik.com/free-vector/isometric-wooden-crate-box_1308-41221.jpg" alt="Airdrop Offer">
+                    </div>
+                    <p class="package-title-english">Airdrop Offer</p>
+                    <button class="btn-enter">প্রবেশ করুন <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Promotion Card -->
+        <div class="card promotion-card" id="promotionCardContainer">
+            <i class="fas fa-bullhorn"></i>
+            <h3 id="promoCardTitle">ফ্রি ফায়ার স্পেশাল অফার!</h3>
+            <p id="promoCardDesc">আপনার পছন্দের ফ্রি ফায়ার ডায়মন্ড প্যাকগুলি দেখুন এবং সেরা ডিল পান।</p>
+            <div class="btn-group">
+                <a href="offers.html" class="btn create-job" id="promoBtn1">অফার দেখুন</a>
+                <a href="tutorial.html" class="btn view-jobs" id="promoBtn2">টপ-আপ গাইড</a>
+            </div>
+        </div>
+
+        <!-- Disclaimer Card -->
+        <div class="disclaimer-card" id="disclaimerCard">
+            <h3 id="disclaimerHeading">গুরুত্বপূর্ণ নিয়মাবলী ও সতর্কীকরণ:</h3>
+            <ul id="disclaimerRulesList">
+                <li>আপনার Free Fire Player ID (UID) সঠিকভাবে যাচাই করুন। ভুল UID-তে ডায়মন্ড টপ-আপ হলে কর্তৃপক্ষ দায়ী থাকবে না।</li>
+                <li>পেমেন্ট করার সময় আপনার মোবাইল নম্বর এবং অন্যান্য তথ্য সঠিকভাবে পূরণ করুন।</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Floating Help Button -->
+    <div class="help-button-wrapper">
+        <button id="helpCenterBtn" class="help-button">
+            <i class="fas fa-headset"></i>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <div class="nav-item-wrapper"><a href="index.html" class="nav-item active"><i class="fas fa-home"></i><span>হোম</span></a></div>
+        <div class="nav-item-wrapper"><a href="offers.html" class="nav-item"><i class="fas fa-tags"></i><span>অফার</span></a></div>
+        <div class="nav-item-wrapper"><a href="tutorial.html" class="nav-item"><i class="fas fa-book"></i><span>টিউটোরিয়াল</span></a></div>
+        <div class="nav-item-wrapper"><a href="history.html" class="nav-item"><i class="fas fa-history"></i><span>অর্ডার</span></a></div>
+        <div class="nav-item-wrapper"><a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a></div>
+    </div>
+
+    <!-- Popup Menu Overlay -->
+    <div class="modal-overlay" id="popupMenuOverlay">
+        <div class="modal-content">
+            <button class="close-popup" id="closePopupBtn"><i class="fas fa-times"></i></button>
+            <div class="popup-profile" style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 14px; margin-bottom: 12px;">
+                <img src="https://api.dicebear.com/9.x/initials/svg?seed=N" alt="Profile" id="popupProfileAvatar" style="width: 50px; height: 50px; border-radius: 50%;">
+                <div class="popup-profile-details">
+                    <p class="name" id="popupDisplayName" style="font-size: 16px; font-weight: 700;">ব্যবহারকারী</p>
+                    <a href="profile.html" style="font-size: 12.5px; color: var(--primary-color); text-decoration: none; font-weight: 600;"><i class="fas fa-pencil-alt"></i> প্রোফাইল এডিট</a>
+                </div>
+            </div>
+            <nav class="popup-nav-list" style="display: flex; flex-direction: column; gap: 6px;">
+                <a href="wallet.html" style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; color: #1e293b; text-decoration: none;"><i class="fas fa-wallet" style="color: var(--primary-color);"></i> <span>আমার ওয়ালেট</span></a>
+                <a href="history.html" style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; color: #1e293b; text-decoration: none;"><i class="fas fa-history" style="color: var(--primary-color);"></i> <span>লেনদেনের ইতিহাস</span></a>
+                <a href="refer.html" style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; color: #1e293b; text-decoration: none;"><i class="fas fa-users" style="color: var(--primary-color);"></i> <span>রেফার করুন</span></a>
+                <a href="#" class="logout" id="logoutLink" style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; color: var(--danger-color); text-decoration: none;"><i class="fas fa-sign-out-alt"></i> <span>লগআউট</span></a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div class="modal-overlay" id="depositModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h3 class="section-title" style="margin-bottom: 12px;">ওয়ালেট ব্যালেন্স</h3>
+            <p style="margin-bottom: 16px; font-size: 14px;">বর্তমান ব্যালেন্স: <strong id="currentBalanceDisplay">৳ 0.00</strong></p>
+            <button class="modal-btn primary" id="depositNowBtn">টাকা যোগ করুন (ডিপোজিট)</button>
+        </div>
+    </div>
+
+    <!-- Player ID Input Modal -->
+    <div class="modal-overlay" id="idInputModal">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h3 class="section-title" style="text-align: center; margin-bottom: 15px;">Free Fire ID দিন</h3>
+            <div class="modal-form-group">
+                <label for="modalPlayerIdInput">আপনার Player ID (UID):</label>
+                <input type="text" id="modalPlayerIdInput" placeholder="এখানে UID লিখুন">
+            </div>
+            <button class="modal-btn primary" id="modalVerifyIdBtn">পরবর্তী ধাপে যান</button>
+        </div>
+    </div>
+
+    <!-- Payment Method Selection Modal -->
+    <div class="modal-overlay" id="paymentMethodSelectionModal">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h3 class="section-title" style="text-align: center; margin-bottom: 14px;">অর্ডার ও পেমেন্ট</h3>
+            <div style="font-size: 13.5px; line-height: 1.5; margin-bottom: 14px; background: #f8fafc; padding: 10px; border-radius: 10px;">
+                <p>প্যাকেজ: <strong id="selectedDiamonds" style="color: var(--primary-color);"></strong></p>
+                <p>মোট মূল্য: <strong id="selectedPrice" style="color: var(--danger-color);"></strong></p>
+                <p>Player ID: <strong id="selectedUid"></strong></p>
+            </div>
+
+            <p id="balanceInsufficientWarning" style="color: var(--danger-color); font-size: 12px; font-weight: 700; text-align: center; display: none;">
+                ওয়ালেটে পর্যাপ্ত ব্যালেন্স নেই!
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <button class="payment-method-btn" id="mainBalancePaymentBtn" data-method="main_balance" style="background: var(--primary-color); color: #fff; padding: 10px;">
+                    <i class="fas fa-wallet" style="font-size: 16px; margin-bottom: 3px;"></i>
+                    <span id="mainBalanceButtonText">মেইন ব্যালেন্স (৳ 0.00)</span>
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="payment-method-btn" id="bkashPaymentBtn" data-method="bkash">
+                        <img src="bKash.png" alt="bKash" onerror="this.src='https://placehold.co/40x30/e21b70/ffffff?text=bKash'">
+                        <span>বিকাশ</span>
+                    </button>
+                    <button class="payment-method-btn" id="nagadPaymentBtn" data-method="nagad">
+                        <img src="nagad.png" alt="Nagad" onerror="this.src='https://placehold.co/40x30/f26c01/ffffff?text=Nagad'">
+                        <span>নগদ</span>
+                    </button>
+                </div>
+            </div>
+            <button class="modal-btn primary" id="finalConfirmPaymentBtn" style="margin-top: 12px;">কনফার্ম করুন</button>
+            <button class="modal-btn secondary" id="backToIdInputBtn" style="margin-top: 6px;">ব্যাক করুন</button>
+        </div>
+    </div>
+
+    <!-- Dynamic New User Notice Modal -->
+    <div class="modal-overlay" id="newUserNoticeModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="close-modal" id="closeNoticeBtn"><i class="fas fa-times"></i></button>
+            <h3 class="section-title" id="newUserNoticeTitle" style="margin-bottom: 12px; color: var(--primary-color);">স্বাগতম!</h3>
+            <p id="newUserNoticeMessage" style="font-size: 13.5px; color: #334155; line-height: 1.5; margin-bottom: 16px;">
+                আমাদের Free Fire Diamond Top-Up সাইটে আপনাকে স্বাগতম।
+            </p>
+            <button class="modal-btn primary" id="watchTutorialBtn">
+                <i class="fab fa-youtube"></i> <span id="watchTutorialBtnText">কিভাবে টপ-আপ করবেন? (ভিডিও)</span>
+            </button>
+            <button class="modal-btn secondary" id="dismissNoticeBtn">বাদ দিন</button>
+        </div>
+    </div>
+
+    <!-- Login Prompt Modal -->
+    <div class="modal-overlay" id="loginPromptModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="close-modal" id="closeLoginPromptBtn"><i class="fas fa-times"></i></button>
+            <h3 class="section-title" style="margin-bottom: 10px;">লগইন প্রয়োজন</h3>
+            <p style="font-size: 13.5px; color: #475569; margin-bottom: 16px;">টপ-আপ করতে অনুগ্রহ করে আপনার অ্যাকাউন্টে লগইন করুন।</p>
+            <button class="modal-btn primary" id="loginFromPromptBtn">লগইন</button>
+            <button class="modal-btn secondary" id="registerFromPromptBtn">রেজিস্টার</button>
+        </div>
+    </div>
+
+    <!-- Dynamic Footer -->
+    <footer class="app-footer">
+        <h4 id="footerSiteName">FF TopUp</h4>
+        <div class="footer-links">
+            <a href="#" id="footerRulesLink">নিয়মাবলী</a>
+            <a href="#" id="footerPrivacyLink">গোপনীয়তা নীতি</a>
+            <a href="#" id="footerRefundLink">Refund Policy</a>
+        </div>
+        <p id="footerContactText">যোগাযোগ: +8801845793151 | support@fftopup.com</p>
+        <p id="footerCopyrightText">&copy; 2026 FF TopUp. সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <script type="module">
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
+            authDomain: "ff-topup-1c7b4.firebaseapp.com",
+            databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-topup-1c7b4",
+            storageBucket: "ff-topup-1c7b4.firebasestorage.app",
+            messagingSenderId: "319376678545",
+            appId: "1:319376678545:web:18b4e552f0eaf73970e930",
+            measurementId: "G-TEJL6H10X4"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(app);
+        const database = firebase.database(app);
+
+        // UI References
+        const headerAuthArea = document.getElementById('headerAuthArea');
+        const userProfileBalanceCard = document.getElementById('userProfileBalanceCard');
+        const userProfileSummaryClickable = document.getElementById('userProfileSummaryClickable');
+        const userProfileAvatar = document.getElementById('userProfileAvatar');
+        const userDisplayName = document.getElementById('userDisplayName');
+        const userBalanceDisplay = document.getElementById('userBalanceDisplay');
+        const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
+        const popupProfileAvatar = document.getElementById('popupProfileAvatar');
+        const popupDisplayName = document.getElementById('popupDisplayName');
+        const logoutLink = document.getElementById('logoutLink');
+
+        // Dynamic Elements from Admin
+        const siteLogoText = document.getElementById('siteLogoText');
+        const marqueeNoticeContainer = document.getElementById('marqueeNoticeContainer');
+        const marqueeNoticeText = document.getElementById('marqueeNoticeText');
+        const maintenanceScreen = document.getElementById('maintenanceScreen');
+        const promoCardTitle = document.getElementById('promoCardTitle');
+        const promoCardDesc = document.getElementById('promoCardDesc');
+        const promoBtn1 = document.getElementById('promoBtn1');
+        const promoBtn2 = document.getElementById('promoBtn2');
+        const promotionCardContainer = document.getElementById('promotionCardContainer');
+        const disclaimerHeading = document.getElementById('disclaimerHeading');
+        const disclaimerRulesList = document.getElementById('disclaimerRulesList');
+        const footerSiteName = document.getElementById('footerSiteName');
+        const footerContactText = document.getElementById('footerContactText');
+        const footerCopyrightText = document.getElementById('footerCopyrightText');
+        const footerRulesLink = document.getElementById('footerRulesLink');
+        const footerPrivacyLink = document.getElementById('footerPrivacyLink');
+        const footerRefundLink = document.getElementById('footerRefundLink');
+
+        // Other Packages Thumbnails
+        const imgMonthly = document.getElementById('imgMonthly');
+        const imgWeekly = document.getElementById('imgWeekly');
+        const imgLevelUp = document.getElementById('imgLevelUp');
+        const imgAirdrop = document.getElementById('imgAirdrop');
+
+        // Notice Modal
+        const newUserNoticeModal = document.getElementById('newUserNoticeModal');
+        const newUserNoticeTitle = document.getElementById('newUserNoticeTitle');
+        const newUserNoticeMessage = document.getElementById('newUserNoticeMessage');
+        const watchTutorialBtnText = document.getElementById('watchTutorialBtnText');
+        const watchTutorialBtn = document.getElementById('watchTutorialBtn');
+        const dismissNoticeBtn = document.getElementById('dismissNoticeBtn');
+        const closeNoticeBtn = document.getElementById('closeNoticeBtn');
+        let dynamicTutorialVideoUrl = 'https://www.youtube.com/watch?v=_ClgCldpNhI';
+
+        // Slider Elements
+        const sliderWrapper = document.getElementById('sliderWrapper');
+        const prevSlideBtn = document.getElementById('prevSlideBtn');
+        const nextSlideBtn = document.getElementById('nextSlideBtn');
+        let currentSlide = 0;
+        let totalSlides = 1;
+        let slideInterval = null;
+
+        // TopUp Modal Elements
+        const diamondPackagesContainer = document.getElementById('diamondPackages');
+        const idInputModal = document.getElementById('idInputModal');
+        const modalPlayerIdInput = document.getElementById('modalPlayerIdInput');
+        const modalVerifyIdBtn = document.getElementById('modalVerifyIdBtn');
+        const paymentMethodSelectionModal = document.getElementById('paymentMethodSelectionModal');
+        const selectedDiamonds = document.getElementById('selectedDiamonds');
+        const selectedPrice = document.getElementById('selectedPrice');
+        const selectedUid = document.getElementById('selectedUid');
+        const balanceInsufficientWarning = document.getElementById('balanceInsufficientWarning');
+        const mainBalancePaymentBtn = document.getElementById('mainBalancePaymentBtn');
+        const mainBalanceButtonText = document.getElementById('mainBalanceButtonText');
+        const finalConfirmPaymentBtn = document.getElementById('finalConfirmPaymentBtn');
+        const backToIdInputBtn = document.getElementById('backToIdInputBtn');
+
+        let currentSelectedPackage = null;
+        let currentEnteredPlayerId = null;
+        let selectedPaymentMethod = null;
+
+        // ==========================================
+        // 1. LIVE SYNC: OTHER PACKAGES IMAGES (Admin Controlled)
+        // ==========================================
+        database.ref('adminSettings/otherPackages').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                if (data.monthlyUrl) imgMonthly.src = data.monthlyUrl;
+                if (data.weeklyUrl) imgWeekly.src = data.weeklyUrl;
+                if (data.levelUpUrl) imgLevelUp.src = data.levelUpUrl;
+                if (data.airdropUrl) imgAirdrop.src = data.airdropUrl;
+            }
+        });
+
+        // ==========================================
+        // 2. LIVE SYNC: ADMIN GENERAL SETTINGS
+        // ==========================================
+        database.ref('adminSettings/general').on('value', (snapshot) => {
+            if (!snapshot.exists()) return;
+            const general = snapshot.val();
+
+            if (general.isMaintenance === true) {
+                maintenanceScreen.style.display = 'flex';
+                return;
+            } else {
+                maintenanceScreen.style.display = 'none';
+            }
+
+            if (general.siteTitle) {
+                siteLogoText.textContent = general.siteTitle;
+                document.title = `${general.siteTitle} - Free Fire Diamond Top-Up`;
+                footerSiteName.textContent = general.siteTitle;
+            }
+
+            if (general.helplinePhone || general.helplineEmail) {
+                footerContactText.textContent = `যোগাযোগ: ${general.helplinePhone || ''} | ${general.helplineEmail || ''}`;
+            }
+
+            if (general.disclaimerHeading) {
+                disclaimerHeading.textContent = general.disclaimerHeading;
+            }
+            if (general.disclaimerRules) {
+                disclaimerRulesList.innerHTML = '';
+                const rules = general.disclaimerRules.split('\n').filter(r => r.trim().length > 0);
+                rules.forEach(rule => {
+                    const li = document.createElement('li');
+                    li.textContent = rule.trim();
+                    disclaimerRulesList.appendChild(li);
+                });
+            }
+
+            if (general.copyrightText) footerCopyrightText.innerHTML = general.copyrightText;
+            if (general.rulesLink) footerRulesLink.href = general.rulesLink;
+            if (general.privacyLink) footerPrivacyLink.href = general.privacyLink;
+            if (general.refundLink) footerRefundLink.href = general.refundLink;
+        });
+
+        // ==========================================
+        // 3. LIVE SYNC: ADMIN NOTICES & PROMOTIONS
+        // ==========================================
+        database.ref('adminSettings/notices').on('value', (snapshot) => {
+            if (!snapshot.exists()) return;
+            const notices = snapshot.val();
+
+            const marquee = notices.marqueeNotice;
+            if (marquee && marquee.isActive && marquee.text) {
+                marqueeNoticeContainer.style.display = 'flex';
+                marqueeNoticeText.textContent = marquee.text;
+            } else {
+                marqueeNoticeContainer.style.display = 'none';
+            }
+
+            const promo = notices.promoCard;
+            if (promo && promo.isActive !== false) {
+                promotionCardContainer.style.display = 'block';
+                if (promo.title) promoCardTitle.textContent = promo.title;
+                if (promo.description) promoCardDesc.textContent = promo.description;
+                if (promo.btn1Text) promoBtn1.textContent = promo.btn1Text;
+                if (promo.btn1Link) promoBtn1.href = promo.btn1Link;
+                if (promo.btn2Text) promoBtn2.textContent = promo.btn2Text;
+                if (promo.btn2Link) promoBtn2.href = promo.btn2Link;
+            } else {
+                promotionCardContainer.style.display = 'none';
+            }
+
+            const popup = notices.popupNotice;
+            if (popup && popup.isActive !== false) {
+                if (popup.title) newUserNoticeTitle.textContent = popup.title;
+                if (popup.message) newUserNoticeMessage.textContent = popup.message;
+                if (popup.btnText) watchTutorialBtnText.textContent = popup.btnText;
+                if (popup.videoUrl) dynamicTutorialVideoUrl = popup.videoUrl;
+
+                const hasSeenNotice = localStorage.getItem('hasSeenNewUserNotice');
+                if (!hasSeenNotice) {
+                    newUserNoticeModal.classList.add('active');
+                }
+            } else {
+                newUserNoticeModal.classList.remove('active');
+            }
+        });
+
+        watchTutorialBtn.addEventListener('click', () => {
+            window.open(dynamicTutorialVideoUrl, '_blank');
+            localStorage.setItem('hasSeenNewUserNotice', 'true');
+            newUserNoticeModal.classList.remove('active');
+        });
+
+        dismissNoticeBtn.addEventListener('click', () => {
+            localStorage.setItem('hasSeenNewUserNotice', 'true');
+            newUserNoticeModal.classList.remove('active');
+        });
+        closeNoticeBtn.addEventListener('click', () => {
+            localStorage.setItem('hasSeenNewUserNotice', 'true');
+            newUserNoticeModal.classList.remove('active');
+        });
+
+        // ==========================================
+        // 4. LIVE SYNC: BANNER SLIDER
+        // ==========================================
+        database.ref('adminSettings/slider/imageSlides').on('value', (snapshot) => {
+            sliderWrapper.innerHTML = '';
+            
+            if (snapshot.exists()) {
+                const slides = [];
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    if (data.isActive !== false) {
+                        slides.push(data);
+                    }
+                });
+
+                slides.sort((a, b) => (a.order || 1) - (b.order || 1));
+
+                if (slides.length > 0) {
+                    slides.forEach(slide => {
+                        const item = document.createElement('div');
+                        item.className = 'slider-item-content';
+                        item.innerHTML = `
+                            <a href="${slide.targetUrl || '#'}" ${slide.targetUrl && slide.targetUrl.startsWith('http') ? 'target="_blank"' : ''}>
+                                <img src="${slide.imageUrl}" class="slider-image-item" alt="${slide.title || 'Banner'}">
+                            </a>
+                        `;
+                        sliderWrapper.appendChild(item);
+                    });
+                    initBannerCarousel();
+                    return;
+                }
+            }
+
+            const defaultBanners = [
+                { url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80', link: 'offers.html' },
+                { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80', link: 'tutorial.html' }
+            ];
+
+            defaultBanners.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'slider-item-content';
+                item.innerHTML = `<a href="${b.link}"><img src="${b.url}" class="slider-image-item" alt="Banner"></a>`;
+                sliderWrapper.appendChild(item);
+            });
+
+            initBannerCarousel();
+        });
+
+        function initBannerCarousel() {
+            const items = document.querySelectorAll('.slider-item-content');
+            totalSlides = items.length;
+            currentSlide = 0;
+            updateSliderPosition();
+
+            if (slideInterval) clearInterval(slideInterval);
+            if (totalSlides > 1) {
+                slideInterval = setInterval(nextSlideFunc, 3500);
+            }
+        }
+
+        function updateSliderPosition() {
+            sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+
+        function nextSlideFunc() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSliderPosition();
+        }
+
+        function prevSlideFunc() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSliderPosition();
+        }
+
+        nextSlideBtn.addEventListener('click', () => {
+            if (slideInterval) clearInterval(slideInterval);
+            nextSlideFunc();
+            slideInterval = setInterval(nextSlideFunc, 3500);
+        });
+
+        prevSlideBtn.addEventListener('click', () => {
+            if (slideInterval) clearInterval(slideInterval);
+            prevSlideFunc();
+            slideInterval = setInterval(nextSlideFunc, 3500);
+        });
+
+        // ==========================================
+        // 5. USER AUTH & WALLET
+        // ==========================================
+        async function updateUI(user) {
+            headerAuthArea.innerHTML = '';
+
+            if (user) {
+                try {
+                    database.ref('users/' + user.uid).on('value', (snapshot) => {
+                        const userData = snapshot.val() || {};
+                        let displayName = userData.fullName || user.displayName || "ব্যবহারকারী";
+
+                        if (displayName.length > 8) {
+                            displayName = displayName.substring(0, 7) + '...';
+                        }
+
+                        const userAvatar = userData.photoURL || user.photoURL || `https://api.dicebear.com/9.x/initials/svg?seed=${displayName}`;
+                        const balance = userData.balance !== undefined ? parseFloat(userData.balance) : 0;
+
+                        userProfileAvatar.src = userAvatar;
+                        userDisplayName.innerHTML = `${displayName} <span class="verified-badge-small"><i class="fas fa-check-circle" style="color: var(--verified-blue);"></i></span>`;
+                        userBalanceDisplay.textContent = `৳ ${balance.toFixed(2)}`;
+                        currentBalanceDisplay.textContent = `৳ ${balance.toFixed(2)}`;
+                        mainBalanceButtonText.textContent = `মেইন ব্যালেন্স (৳ ${balance.toFixed(2)})`;
+                        userProfileBalanceCard.style.display = 'flex';
+
+                        popupProfileAvatar.src = userAvatar;
+                        popupDisplayName.textContent = userData.fullName || user.displayName || 'ব্যবহারকারী';
+                    });
+
+                    headerAuthArea.innerHTML = `<div class="menu-icon" id="headerMenuIcon"><i class="fas fa-bars"></i></div>`;
+                    document.getElementById('headerMenuIcon').addEventListener('click', () => {
+                        document.getElementById('popupMenuOverlay').classList.add('active');
+                    });
+
+                } catch (error) {
+                    console.error("User data error:", error);
+                }
+
+            } else {
+                userProfileBalanceCard.style.display = 'none';
+                headerAuthArea.innerHTML = ``;
+            }
+        }
+
+        auth.onAuthStateChanged(updateUI);
+
+        // ==========================================
+        // 6. DIAMOND PACKAGES & ORDER FLOW
+        // ==========================================
+        database.ref('packages').orderByChild('order').on('value', (snapshot) => {
+            diamondPackagesContainer.innerHTML = '';
+            if (snapshot.exists()) {
+                snapshot.forEach((child) => {
+                    const pkg = child.val();
+                    if (pkg.isActive !== false) {
+                        const div = document.createElement('div');
+                        div.className = 'package-item';
+                        div.dataset.diamonds = pkg.diamonds;
+                        div.dataset.price = pkg.price;
+                        div.innerHTML = `
+                            <div class="diamond-info">
+                                <i class="${pkg.icon || 'fas fa-gem'}"></i> 
+                                <span>${pkg.diamonds}</span>
+                            </div>
+                            <span class="diamond-price">৳ ${pkg.price}</span>
+                        `;
+                        diamondPackagesContainer.appendChild(div);
+                    }
+                });
+            } else {
+                diamondPackagesContainer.innerHTML = '<p style="text-align: center; color: var(--subtle-text-color); grid-column: span 2;">কোনো ডায়মন্ড প্যাক নেই।</p>';
+            }
+        });
+
+        diamondPackagesContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('.package-item');
+            if (target) {
+                if (!auth.currentUser) {
+                    document.getElementById('loginPromptModal').classList.add('active');
+                    return;
+                }
+
+                document.querySelectorAll('.package-item').forEach(i => i.classList.remove('selected'));
+                target.classList.add('selected');
+
+                currentSelectedPackage = {
+                    diamonds: target.dataset.diamonds,
+                    price: parseFloat(target.dataset.price)
+                };
+
+                modalPlayerIdInput.value = '';
+                idInputModal.classList.add('active');
+            }
+        });
+
+        modalVerifyIdBtn.addEventListener('click', () => {
+            const uid = modalPlayerIdInput.value.trim();
+            if (!uid) {
+                alert('অনুগ্রহ করে আপনার Free Fire Player ID (UID) দিন।');
+                return;
+            }
+            currentEnteredPlayerId = uid;
+            idInputModal.classList.remove('active');
+            showPaymentModal();
+        });
+
+        async function showPaymentModal() {
+            selectedDiamonds.textContent = `${currentSelectedPackage.diamonds} ডায়মন্ড`;
+            selectedPrice.textContent = `৳ ${currentSelectedPackage.price.toFixed(2)}`;
+            selectedUid.textContent = currentEnteredPlayerId;
+
+            const userSnap = await database.ref('users/' + auth.currentUser.uid).once('value');
+            const userBal = userSnap.val() ? parseFloat(userSnap.val().balance || 0) : 0;
+
+            document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('selected-payment-method'));
+
+            if (userBal < currentSelectedPackage.price) {
+                balanceInsufficientWarning.style.display = 'block';
+                mainBalancePaymentBtn.disabled = true;
+                mainBalancePaymentBtn.style.opacity = '0.5';
+                selectedPaymentMethod = null;
+            } else {
+                balanceInsufficientWarning.style.display = 'none';
+                mainBalancePaymentBtn.disabled = false;
+                mainBalancePaymentBtn.style.opacity = '1';
+                mainBalancePaymentBtn.classList.add('selected-payment-method');
+                selectedPaymentMethod = 'main_balance';
+            }
+
+            paymentMethodSelectionModal.classList.add('active');
+        }
+
+        document.querySelectorAll('.payment-method-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.disabled) return;
+                document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('selected-payment-method'));
+                this.classList.add('selected-payment-method');
+                selectedPaymentMethod = this.dataset.method;
+            });
+        });
+
+        finalConfirmPaymentBtn.addEventListener('click', async () => {
+            if (!selectedPaymentMethod) {
+                alert('একটি পেমেন্ট পদ্ধতি নির্বাচন করুন।');
+                return;
+            }
+
+            if (selectedPaymentMethod === 'main_balance') {
+                const userRef = database.ref('users/' + auth.currentUser.uid);
+                userRef.child('balance').transaction((curr) => {
+                    const balance = typeof curr === 'number' ? curr : 0;
+                    if (balance >= currentSelectedPackage.price) {
+                        return balance - currentSelectedPackage.price;
+                    }
+                    return undefined;
+                }, async (err, committed) => {
+                    if (!committed) {
+                        alert('আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!');
+                    } else {
+                        await database.ref('orders').push().set({
+                            uid: auth.currentUser.uid,
+                            playerId: currentEnteredPlayerId,
+                            playerName: auth.currentUser.displayName || 'N/A',
+                            diamonds: currentSelectedPackage.diamonds,
+                            price: currentSelectedPackage.price,
+                            paymentMethod: 'main_balance',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                            status: 'pending'
+                        });
+
+                        alert('টপ-আপ অনুরোধ পাঠানো হয়েছে! অর্ডার হিস্টরি চেক করুন।');
+                        paymentMethodSelectionModal.classList.remove('active');
+                        window.location.href = 'history.html';
+                    }
+                });
+
+            } else {
+                sessionStorage.setItem('paymentDetails', JSON.stringify({
+                    uid: auth.currentUser.uid,
+                    playerId: currentEnteredPlayerId,
+                    playerName: auth.currentUser.displayName || 'N/A',
+                    diamonds: currentSelectedPackage.diamonds,
+                    price: currentSelectedPackage.price,
+                    paymentMethod: selectedPaymentMethod,
+                    timestamp: new Date().toISOString()
+                }));
+                window.location.href = 'live_pyment.html';
+            }
+        });
+
+        backToIdInputBtn.addEventListener('click', () => {
+            paymentMethodSelectionModal.classList.remove('active');
+            idInputModal.classList.add('active');
+        });
+
+        document.querySelectorAll('.other-package-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const href = this.dataset.href;
+                if (href) {
+                    if (!auth.currentUser) {
+                        document.getElementById('loginPromptModal').classList.add('active');
+                        return;
+                    }
+                    window.location.href = href;
+                }
+            });
+        });
+
+        document.getElementById('helpCenterBtn').addEventListener('click', () => {
+            window.location.href = 'help_center.html';
+        });
+
+        document.querySelectorAll('.close-modal, .close-popup').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.modal-overlay').classList.remove('active');
+            });
+        });
+
+        userBalanceDisplay.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (auth.currentUser) {
+                document.getElementById('depositModal').classList.add('active');
+            } else {
+                document.getElementById('loginPromptModal').classList.add('active');
+            }
+        });
+
+        document.getElementById('depositNowBtn').addEventListener('click', () => {
+            window.location.href = 'wallet.html';
+        });
+
+        document.getElementById('loginFromPromptBtn').addEventListener('click', () => {
+            window.location.href = 'auth.html?form=login';
+        });
+        document.getElementById('registerFromPromptBtn').addEventListener('click', () => {
+            window.location.href = 'auth.html?form=register';
+        });
+
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await auth.signOut();
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>
