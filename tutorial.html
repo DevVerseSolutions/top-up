@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>টিউটোরিয়াল - FF TopUp</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -144,7 +145,7 @@
         /* Video Tutorial Section */
         .video-tutorial-grid {
             display: grid;
-            grid-template-columns: 1fr; /* Single column for videos */
+            grid-template-columns: 1fr;
             gap: 20px;
         }
         .video-item {
@@ -152,19 +153,27 @@
             border-radius: 15px;
             box-shadow: var(--shadow);
             overflow: hidden;
+            border: 1px solid #eef2f5;
         }
         .video-item h4 {
-            font-size: 16px;
-            padding: 15px;
-            color: var(--primary-color);
+            font-size: 15.5px;
+            padding: 14px 15px;
+            color: var(--text-color);
             font-weight: 700;
             border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .video-item h4 i {
+            color: #ef4444;
         }
         .video-wrapper {
             position: relative;
             width: 100%;
             padding-top: 56.25%; /* 16:9 Aspect Ratio */
             background-color: #000;
+            cursor: pointer;
         }
         .youtube-iframe {
             position: absolute;
@@ -173,6 +182,7 @@
             width: 100%;
             height: 100%;
             border: none;
+            pointer-events: none; /* Allows click to trigger overlay event */
         }
         .video-thumbnail-overlay {
             position: absolute;
@@ -186,27 +196,30 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: opacity 0.3s ease;
-            opacity: 1;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 5;
         }
         .video-thumbnail-overlay:hover {
-            opacity: 0.8;
+            opacity: 0.9;
         }
         .video-thumbnail-overlay i {
-            font-size: 40px;
-            color: var(--white-color);
-            text-shadow: 0 0 10px rgba(0,0,0,0.7);
+            font-size: 48px;
+            color: #ef4444;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
         }
-        .video-thumbnail-overlay.hidden {
-            display: none;
+        .video-thumbnail-overlay:hover i {
+            transform: scale(1.15);
         }
 
-
-        /* Floating Help Button (Consistent) */
+        /* Floating Help Button */
         .help-button-wrapper {
             position: fixed;
             right: 20px; 
-            bottom: 100px; /* Above the bottom navigation */
+            bottom: 100px; 
             z-index: 999;
         }
         .help-button {
@@ -225,11 +238,8 @@
             transition: transform 0.3s ease;
             animation: pulse-help 2s infinite; 
         }
-        .help-button i {
-            transition: transform 0.2s ease-in-out;
-        }
 
-        /* Bottom Navigation Bar (Consistent) */
+        /* Bottom Navigation Bar */
         .bottom-nav { 
             position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); 
             width: 95%; max-width: 420px; 
@@ -249,7 +259,7 @@
         .nav-item span { font-size: 11px; margin-top: 3px; } 
         .nav-item:hover, .nav-item.active { color: var(--primary-color); }
 
-        /* Popup Menu Overlay (Consistent) */
+        /* Popup Menu Overlay */
         .modal-overlay { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); 
             z-index: 2000; display: none; align-items: center; justify-content: center; 
@@ -261,30 +271,27 @@
             width: 90%; max-width: 350px; padding: 25px; 
             position: relative; animation: popup-anim 0.3s ease; 
         }
-        .close-popup, .close-modal { 
+        .close-popup { 
             position: absolute; top: 15px; right: 15px; 
             background: #f1f5f9; border: none; 
             width: 35px; height: 35px; border-radius: 50%; 
             font-size: 16px; color: var(--subtle-text-color); 
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            z-index: 10; transition: transform 0.2s; 
+            transition: transform 0.2s; 
         }
-        .close-popup:hover, .close-modal:hover { transform: scale(1.1); }
+        .close-popup:hover { transform: scale(1.1); }
         
         .popup-profile { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 15px; }
         .popup-profile img { width: 60px; height: 60px; border-radius: 50%; }
         .popup-profile-details .name { font-size: 20px; font-weight: 700; }
         .popup-profile-details .edit-profile { font-size: 14px; color: var(--primary-color); text-decoration: none; font-weight: 500; }
-        .popup-profile-details .edit-profile i { margin-right: 5px; }
         .popup-nav-list a { display: flex; align-items: center; text-decoration: none; color: var(--text-color); padding: 15px; border-radius: 12px; transition: background-color 0.2s; }
         .popup-nav-list a:hover { background-color: #f0f2f5; }
         .popup-nav-list i { font-size: 20px; color: var(--primary-color); width: 40px; }
         .popup-nav-list span { font-size: 16px; font-weight: 500; }
         .popup-nav-list a.logout { color: var(--danger-color); }
-        .popup-nav-list a.logout i { color: var(--danger-color); }
 
-
-        /* Footer Styles (Consistent) */
+        /* Footer */
         .app-footer {
             text-align: center;
             padding: 25px 15px;
@@ -305,10 +312,6 @@
             text-decoration: none;
             margin: 0 8px;
             font-weight: 500;
-            transition: color 0.2s;
-        }
-        .app-footer .footer-links a:hover {
-            color: var(--secondary-color);
         }
         .app-footer p {
             margin-top: 15px;
@@ -322,9 +325,7 @@
         <div class="logo-container">
             <span class="logo-text">FF TopUp</span>
         </div>
-        <div class="auth-area" id="headerAuthArea">
-            <!-- Content changes based on login state (JS handles this) -->
-        </div>
+        <div class="auth-area" id="headerAuthArea"></div>
     </header>
 
     <main class="main-content">
@@ -391,32 +392,36 @@
             </ul>
         </div>
 
-        <h2 class="section-title">ভিডিও টিউটোরিয়াল</h2>
+        <h2 class="section-title">ভিডিও টিউটোরিয়াল (ক্লিক করে সরাসরি ইউটিউবে দেখুন)</h2>
 
+        <!-- DYNAMIC VIDEO TUTORIAL SECTION (Controlled 100% from Admin) -->
         <div class="card video-tutorial-grid">
+            <!-- Video 1 -->
             <div class="video-item">
-                <h4>কিভাবে Free Fire UID খুঁজে বের করবেন?</h4>
-                <div class="video-wrapper">
-                    <iframe class="youtube-iframe" src="https://www.youtube.com/embed/your_tutorial_video_id_1?autoplay=0&controls=1&showinfo=0&rel=0&enablejsapi=1" frameborder="0" allowfullscreen allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" id="video1Iframe"></iframe>
-                    <div class="video-thumbnail-overlay" style="background-image: url('https://img.youtube.com/vi/your_tutorial_video_id_1/mqdefault.jpg');" data-video-id="video1Iframe">
+                <h4 id="video1Title"><i class="fab fa-youtube"></i> কিভাবে Free Fire UID খুঁজে বের করবেন?</h4>
+                <div class="video-wrapper" id="video1Wrapper">
+                    <iframe class="youtube-iframe" src="" allowfullscreen id="video1Iframe"></iframe>
+                    <div class="video-thumbnail-overlay" id="video1Overlay" style="background-image: url('https://img.youtube.com/vi/your_tutorial_video_id_1/mqdefault.jpg');">
                         <i class="fas fa-play-circle"></i>
                     </div>
                 </div>
             </div>
+            <!-- Video 2 -->
             <div class="video-item">
-                <h4>ব্যালেন্স থেকে ডায়মন্ড টপ-আপ প্রক্রিয়া</h4>
-                <div class="video-wrapper">
-                    <iframe class="youtube-iframe" src="https://www.youtube.com/embed/your_tutorial_video_id_2?autoplay=0&controls=1&showinfo=0&rel=0&enablejsapi=1" frameborder="0" allowfullscreen allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" id="video2Iframe"></iframe>
-                    <div class="video-thumbnail-overlay" style="background-image: url('https://img.youtube.com/vi/your_tutorial_video_id_2/mqdefault.jpg');" data-video-id="video2Iframe">
+                <h4 id="video2Title"><i class="fab fa-youtube"></i> ব্যালেন্স থেকে ডায়মন্ড টপ-আপ প্রক্রিয়া</h4>
+                <div class="video-wrapper" id="video2Wrapper">
+                    <iframe class="youtube-iframe" src="" allowfullscreen id="video2Iframe"></iframe>
+                    <div class="video-thumbnail-overlay" id="video2Overlay" style="background-image: url('https://img.youtube.com/vi/your_tutorial_video_id_2/mqdefault.jpg');">
                         <i class="fas fa-play-circle"></i>
                     </div>
                 </div>
             </div>
+            <!-- Video 3 -->
             <div class="video-item">
-                <h4>বিকাশ/নগদ পেমেন্ট গাইড</h4>
-                <div class="video-wrapper">
-                    <iframe class="youtube-iframe" src="https://www.youtube.com/embed/your_tutorial_video_id_3?autoplay=0&controls=1&showinfo=0&rel=0&enablejsapi=1" frameborder="0" allowfullscreen allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" id="video3Iframe"></iframe>
-                    <div class="video-thumbnail-overlay" style="background-image: url('https://img.youtube.com/vi/your_tutorial_video_id_3/mqdefault.jpg');" data-video-id="video3Iframe">
+                <h4 id="video3Title"><i class="fab fa-youtube"></i> বিকাশ/নগদ পেমেন্ট গাইড</h4>
+                <div class="video-wrapper" id="video3Wrapper">
+                    <iframe class="youtube-iframe" src="" allowfullscreen id="video3Iframe"></iframe>
+                    <div class="video-thumbnail-overlay" id="video3Overlay" style="background-image: url('https://img.youtube.com/vi/your_tutorial_video_id_3/mqdefault.jpg');">
                         <i class="fas fa-play-circle"></i>
                     </div>
                 </div>
@@ -440,14 +445,14 @@
         <div class="nav-item-wrapper"><a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a></div>
     </div>
 
-    <!-- Popup Menu Overlay (for general settings/menu triggered by header menu icon) -->
+    <!-- Popup Menu Overlay -->
     <div class="modal-overlay" id="popupMenuOverlay">
         <div class="modal-content">
             <button class="close-popup" id="closePopupBtn"><i class="fas fa-times"></i></button>
             <div class="popup-profile">
                 <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=N" alt="Profile" id="popupProfileAvatar">
                 <div class="popup-profile-details">
-                    <p class="name" id="popupDisplayName">নাহিদ</p>
+                    <p class="name" id="popupDisplayName">ব্যবহারকারী</p>
                     <a href="profile.html" class="edit-profile"> <i class="fas fa-pencil-alt"></i> প্রোফাইল এডিট</a>
                 </div>
             </div>
@@ -460,185 +465,146 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="app-footer">
+        <h4>FF TopUp</h4>
+        <div class="footer-links">
+            <a href="#">নিয়মাবলী</a>
+            <a href="#">গোপনীয়তা নীতি</a>
+            <a href="#">Refund Policy</a>
+        </div>
+        <p>&copy; 2026 FF TopUp. সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> <!-- For Firebase Auth -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script> <!-- For Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
     <script type="module">
-        // Your web app's Firebase configuration
         const firebaseConfig = {
-  apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
-  authDomain: "ff-topup-1c7b4.firebaseapp.com",
-  databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "ff-topup-1c7b4",
-  storageBucket: "ff-topup-1c7b4.firebasestorage.app",
-  messagingSenderId: "319376678545",
-  appId: "1:319376678545:web:18b4e552f0eaf73970e930",
-  measurementId: "G-TEJL6H10X4"
-};
+            apiKey: "AIzaSyB2005LXbWHrZd-EkBSE93MKampL4pvDBg",
+            authDomain: "ff-topup-1c7b4.firebaseapp.com",
+            databaseURL: "https://ff-topup-1c7b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-topup-1c7b4",
+            storageBucket: "ff-topup-1c7b4.firebasestorage.app",
+            messagingSenderId: "319376678545",
+            appId: "1:319376678545:web:18b4e552f0eaf73970e930",
+            measurementId: "G-TEJL6H10X4"
+        };
 
-        // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
-        const analytics = firebase.analytics(app);
-        const auth = firebase.auth(app); // Get Auth instance
-        const database = firebase.database(app); // Get Realtime Database instance
+        const auth = firebase.auth(app);
+        const database = firebase.database(app);
 
-        // --- UI Elements ---
+        // UI references
         const headerAuthArea = document.getElementById('headerAuthArea');
         const popupProfileAvatar = document.getElementById('popupProfileAvatar');
         const popupDisplayName = document.getElementById('popupDisplayName');
         const logoutLink = document.getElementById('logoutLink');
-        
-        // --- Video Tutorial Elements ---
-        const videoWrappers = document.querySelectorAll('.video-wrapper');
 
-        // --- Authentication & UI Updates for Header/Popup ---
-        async function updateUI(user) {
-            headerAuthArea.innerHTML = ''; 
+        // Video Elements
+        const video1Title = document.getElementById('video1Title');
+        const video1Iframe = document.getElementById('video1Iframe');
+        const video1Overlay = document.getElementById('video1Overlay');
+        const video1Wrapper = document.getElementById('video1Wrapper');
 
+        const video2Title = document.getElementById('video2Title');
+        const video2Iframe = document.getElementById('video2Iframe');
+        const video2Overlay = document.getElementById('video2Overlay');
+        const video2Wrapper = document.getElementById('video2Wrapper');
+
+        const video3Title = document.getElementById('video3Title');
+        const video3Iframe = document.getElementById('video3Iframe');
+        const video3Overlay = document.getElementById('video3Overlay');
+        const video3Wrapper = document.getElementById('video3Wrapper');
+
+        let videoUrls = {
+            v1: 'https://www.youtube.com',
+            v2: 'https://www.youtube.com',
+            v3: 'https://www.youtube.com'
+        };
+
+        // Extract YouTube Video ID
+        function extractYouTubeId(url) {
+            if (!url) return '';
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : url;
+        }
+
+        // Setup Video Card with Live YouTube Link
+        function setupVideoCard(titleEl, iframeEl, overlayEl, title, url, fallbackId) {
+            if (title) titleEl.innerHTML = `<i class="fab fa-youtube"></i> ${title}`;
+            
+            const rawUrl = url || `https://www.youtube.com/watch?v=${fallbackId}`;
+            const yId = extractYouTubeId(rawUrl);
+
+            iframeEl.src = `https://www.youtube.com/embed/${yId}?controls=1&rel=0`;
+            overlayEl.style.backgroundImage = `url('https://img.youtube.com/vi/${yId}/hqdefault.jpg')`;
+
+            // Click listener: Directly opens YouTube as requested
+            overlayEl.onclick = () => {
+                window.open(rawUrl, '_blank');
+            };
+        }
+
+        // Live Listener to Admin's Tutorial Videos
+        database.ref('adminSettings/tutorialVideos').on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+
+            // Video 1
+            const v1 = data.video1 || {};
+            videoUrls.v1 = v1.url || 'https://www.youtube.com';
+            setupVideoCard(video1Title, video1Iframe, video1Overlay, v1.title, v1.url, 'your_tutorial_video_id_1');
+
+            // Video 2
+            const v2 = data.video2 || {};
+            videoUrls.v2 = v2.url || 'https://www.youtube.com';
+            setupVideoCard(video2Title, video2Iframe, video2Overlay, v2.title, v2.url, 'your_tutorial_video_id_2');
+
+            // Video 3
+            const v3 = data.video3 || {};
+            videoUrls.v3 = v3.url || 'https://www.youtube.com';
+            setupVideoCard(video3Title, video3Iframe, video3Overlay, v3.title, v3.url, 'your_tutorial_video_id_3');
+        });
+
+        // User Auth
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                let displayNameForHeader = user.displayName || "ব্যবহারকারী";
-                const MAX_NAME_LENGTH = 6; 
-
                 try {
-                    const userSnapshot = await database.ref('users/' + user.uid).once('value');
-                    const userData = userSnapshot.val();
-                    
-                    let fullUserName = user.displayName || 'ব্যবহারকারী';
-                    if (userData && userData.fullName) {
-                        fullUserName = userData.fullName;
-                        if (fullUserName.length > MAX_NAME_LENGTH) {
-                            displayNameForHeader = fullUserName.substring(0, MAX_NAME_LENGTH - 1) + '...';
-                        } else {
-                            displayNameForHeader = fullUserName;
-                        }
-                    } else {
-                         if (displayNameForHeader.length > MAX_NAME_LENGTH) {
-                            displayNameForHeader = displayNameForHeader.substring(0, MAX_NAME_LENGTH - 1) + '...';
-                        }
-                    }
-                    
-                    const userAvatar = (userData && userData.photoURL) || user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${fullUserName}`;
-                    
+                    const snap = await database.ref('users/' + user.uid).once('value');
+                    const userData = snap.val() || {};
+                    let displayName = userData.fullName || user.displayName || 'ব্যবহারকারী';
+
                     headerAuthArea.innerHTML = `<div class="menu-icon" id="headerMenuIcon"><i class="fas fa-bars"></i></div>`;
                     document.getElementById('headerMenuIcon').addEventListener('click', () => {
                         document.getElementById('popupMenuOverlay').classList.add('active');
                     });
 
-                    popupProfileAvatar.src = userAvatar;
-                    popupDisplayName.textContent = fullUserName;
-                    logoutLink.style.display = 'flex';
-
-                } catch (error) {
-                    console.error("Error fetching user data:", error);
-                    // Fallback UI
-                    headerAuthArea.innerHTML = `<div class="menu-icon" id="headerMenuIcon"><i class="fas fa-bars"></i></div>`;
-                     document.getElementById('headerMenuIcon').addEventListener('click', () => {
-                        document.getElementById('popupMenuOverlay').classList.add('active');
-                    });
-                    popupProfileAvatar.src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=Guest`;
-                    popupDisplayName.textContent = 'অতিথি';
-                    logoutLink.style.display = 'none';
+                    popupProfileAvatar.src = userData.photoURL || user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=User`;
+                    popupDisplayName.textContent = displayName;
+                } catch (err) {
+                    console.error(err);
                 }
-
             } else {
-                // User is signed out.
-                headerAuthArea.innerHTML = ``; // No menu icon, no login button from header
-                popupProfileAvatar.src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=Guest`;
-                popupDisplayName.textContent = `অতিথি`;
-                logoutLink.style.display = 'none';
+                headerAuthArea.innerHTML = '';
             }
-        }
+        });
 
-        // Listen for auth state changes
-        auth.onAuthStateChanged(updateUI);
+        // Modals & Menu
+        document.getElementById('closePopupBtn').addEventListener('click', () => {
+            document.getElementById('popupMenuOverlay').classList.remove('active');
+        });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- General Modal Toggling Logic ---
-            const setupModalToggle = (openTriggerSelector, targetElementId, closeTriggerSelector) => {
-                const targetElement = document.getElementById(targetElementId);
-                if (!targetElement) return;
+        document.getElementById('helpCenterBtn').addEventListener('click', () => {
+            window.location.href = 'help_center.html';
+        });
 
-                if (openTriggerSelector) {
-                    document.querySelectorAll(openTriggerSelector).forEach(button => {
-                        button.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            targetElement.classList.add('active');
-                        });
-                    });
-                }
-                
-                if (closeTriggerSelector) {
-                    const closeButton = targetElement.querySelector(closeTriggerSelector);
-                    if (closeButton) {
-                        closeButton.addEventListener('click', () => {
-                            targetElement.classList.remove('active');
-                        });
-                    }
-                }
-
-                targetElement.addEventListener('click', (e) => {
-                    if (e.target === targetElement) {
-                        targetElement.classList.remove('active');
-                    }
-                });
-            };
-
-            // Setup modals
-            setupModalToggle(null, 'popupMenuOverlay', '#closePopupBtn'); // Triggered by headerMenuIcon
-
-            // --- Video Playback Logic ---
-            videoWrappers.forEach(wrapper => {
-                const thumbnailOverlay = wrapper.querySelector('.video-thumbnail-overlay');
-                const iframe = wrapper.querySelector('.youtube-iframe');
-                
-                thumbnailOverlay.addEventListener('click', () => {
-                    thumbnailOverlay.classList.add('hidden');
-                    // Add autoplay to iframe src if not already there
-                    let src = iframe.src;
-                    if (src.includes('autoplay=0')) {
-                        src = src.replace('autoplay=0', 'autoplay=1');
-                    } else if (!src.includes('autoplay')) {
-                        src += '&autoplay=1';
-                    }
-                    iframe.src = src; // Reload iframe with autoplay
-                });
-            });
-
-
-            // Floating Help Button link
-            document.getElementById('helpCenterBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                window.location.href = 'help_center.html';
-            });
-
-
-            // --- Logout Functionality (from popup menu) ---
-            const handleLogout = async (e) => {
-                e.preventDefault();
-                try {
-                    await auth.signOut();
-                    alert('আপনি সফলভাবে লগআউট করেছেন!');
-                    document.getElementById('popupMenuOverlay').classList.remove('active'); 
-                    // updateUI will be called by onAuthStateChanged listener
-                } catch (error) {
-                    console.error('Error signing out:', error);
-                    alert('লগআউট করতে সমস্যা হয়েছে।');
-                }
-            };
-            logoutLink.addEventListener('click', handleLogout); 
-
-
-            // --- Navigation Button Actions ---
-            // Bottom Nav links 
-            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(1) a').href = 'index.html'; // Home
-            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(2) a').href = 'offers.html'; // Offer
-            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(3) a').href = 'tutorial.html'; // Tutorial (This page)
-            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(4) a').href = 'history.html'; // Order
-            document.querySelector('.bottom-nav .nav-item-wrapper:nth-child(5) a').href = 'profile.html'; // Profile
-
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await auth.signOut();
+            window.location.reload();
         });
     </script>
 </body>
